@@ -10,7 +10,7 @@ date:
 consensus: true
 v: 3
 area: "Security"
-workgroup: "RATS"
+workgroup: "Remote ATtestation ProcedureS"
 keyword:
  - PQC
  - COSE
@@ -18,14 +18,14 @@ keyword:
  - Hybrid
  - HPKE
  - Post-Quantum
- 
+
 
 venue:
-  group: "RATS"
+  group: "Remote ATtestation ProcedureS"
   type: "Working Group"
   mail: "rats@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/rats/"
-  
+
 
 stand_alone: yes
 pi: [toc, sortrefs, symrefs, strict, comments, docmapping]
@@ -38,13 +38,13 @@ author:
     region: Karnataka
     country: India
     email: "k.tirumaleswar_reddy@nokia.com"
- 
+
 normative:
 
-informative: 
+informative:
 
 
-     
+
 --- abstract
 
 This document defines a new Entity Attestation Token (EAT) claim that cryptographically binds a private key used to sign a certificate signing request (CSR), or the private key corresponding to an end-entity certificate used for TLS authentication, to an attested execution environment.
@@ -63,12 +63,12 @@ Remote attestation enables an entity to produce attestation evidence that a veri
 In certificate enrollment workflows, a Certification Authority (CA) may require attestation evidence demonstrating that the private key corresponding to the public key in a certificate signing request (CSR) is protected by a hardware-backed environment. The LAMPS CSR Attestation specification {{!I-D.ietf-lamps-csr-attestation}} defines mechanisms for including attestation evidence alongside a CSR. In this model, the CA verifies the CSR signature using the public key contained in the request and independently verifies the attestation evidence according to the RATS architecture, using applicable endorsements and trust anchors.
 However, the attestation evidence does not inherently provide a cryptographic proof that the private key used to sign the CSR is the same key that is generated, stored, or protected within the attested environment. The CSR signature demonstrates possession of a private key, and the attestation demonstrates properties of a platform state, but there is no standardized mechanism that cryptographically binds these two validations together. An endpoint could present valid attestation evidence from a protected environment while submitting a certificate signing request (CSR) that is signed with a private key not generated or stored within that environment. In this case, the Certification Authority has no intrinsic cryptographic assurance that the private key corresponding to the CSR public key benefits from the protections described in the attestation evidence.
 
-A similar structural gap exists in transport-layer scenarios. The TLS Exported Attestation specification 
+A similar structural gap exists in transport-layer scenarios. The TLS Exported Attestation specification
 {{!I-D.fossati-tls-exported-attestation}} defines mechanisms for conveying attestation evidence within a TLS session. While the attestation evidence is bound to the TLS handshake transcript, it does not intrinsically bind the attested environment to the private key corresponding to the end-entity certificate used for TLS authentication. An endpoint could therefore obtain valid attestation evidence from a protected environment while performing certificate-based TLS authentication using a private key that is not confined to that environment. For example, the TLS private key may reside outside the trusted execution environment and lack the protections claimed by the attestation evidence.
 
 This separation between validation of attestation evidence and validation of certificate private key creates a class of key substitution attacks. In such an attack:
 
-* A valid attestation produced by a genuine hardware-protected environment is presented to the verifier; and  
+* A valid attestation produced by a genuine hardware-protected environment is presented to the verifier; and
 * A private key that is not generated or protected within that environment is used in the CSR or TLS authentication flow.
 
 Because the attestation evidence and the certificate private key are validated independently, the verifier has no intrinsic cryptographic assurance that the operational private key benefits from the protections described in the attestation. This undermines security policy objectives that require the certificate private key to be generated and constrained within the attested environment.
@@ -112,7 +112,7 @@ The claim provides two properties:
 
 The mechanism operates by embedding a proof-of-possession (PoP) generated using the Subject Key within attestation evidence that is signed by the Attestation Key (AK). Because the attestation evidence is authenticated by the AK, and the PoP is contained within that evidence, successful verification establishes that:
 
-- The attested platform state is authentic; and  
+- The attested platform state is authentic; and
 - The private component of the Subject Key is under the control of the attested environment at the time the evidence was generated.
 
 This construction creates a cryptographic linkage between the Subject Key and the attested platform state, mitigating Key Substitution Attacks.
@@ -145,7 +145,7 @@ The nonce MUST be supplied by the verifier and MUST be unpredictable and unique 
 
 Because the PoP is embedded within AK-signed attestation evidence, successful verification establishes that:
 
-- The attested platform state is authentic; and  
+- The attested platform state is authentic; and
 - The Subject Key was under control of the attested environment at the time the evidence was created.
 
 ## Freshness Requirements
@@ -165,7 +165,7 @@ Upon receipt of attestation evidence containing this claim, the entity responsib
 4. Confirm that the nonce used in the PoP matches the verifier-provided freshness value. If the nonce does not match, the binding verification MUST fail.
 
 5. Compare the Subject Public Key contained in the claim with the public key:
-   - contained in the CSR, in certificate enrollment workflows; or  
+   - contained in the CSR, in certificate enrollment workflows; or
    - contained in the end-entity certificate used for TLS authentication.
 
    This comparison MUST be performed using a canonical representation suitable for unambiguous equality checking. If the keys do not match exactly, the binding verification MUST fail.
@@ -190,7 +190,7 @@ public-key = cose-key / jwk
 
 In CBOR-based EAT, the public key MUST be encoded as a COSE_Key and the pop-signature MUST be a byte string. In JSON-based EAT, the public key MUST be encoded as a JWK and the pop-signature MUST be a Base64URL-encoded string.
 
-To ensure unambiguous verification, the subject-public-key MUST include an algorithm identifier (alg parameter in COSE/JWK) specifying the signature scheme used to generate the pop-signature. 
+To ensure unambiguous verification, the subject-public-key MUST include an algorithm identifier (alg parameter in COSE/JWK) specifying the signature scheme used to generate the pop-signature.
 
 ## subject-public-key
 
