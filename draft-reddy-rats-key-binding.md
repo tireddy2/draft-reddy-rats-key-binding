@@ -3,7 +3,7 @@ title: "A Key Binding Claim for Entity Attestation Tokens (EAT)"
 abbrev: "EAT-KB"
 category: std
 
-docname: draft-reddy-rats-key-binding
+docname: draft-reddy-rats-key-binding-latest
 submissiontype: IETF
 number:
 date:
