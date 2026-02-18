@@ -220,9 +220,7 @@ If the comparison fails, the binding verification MUST fail, even if the attesta
 
 ## pop-signature
 
-The `pop-signature` field contains a digital signature generated using the private component of the Subject Key.
-
-The signature MUST be computed over the verifier-provided nonce using the signature algorithm identified by the `pop-algorithm` field. The signature MUST be verifiable using the corresponding `subject-public-key` and the algorithm identified by `pop-algorithm`.
+The `pop-signature` field contains a digital signature generated using the private component of the Subject Key over the verifier-provided nonce. The signature MUST be generated using the signature algorithm identified by `pop-algorithm`. The `pop-signature` MUST be verifiable using the corresponding `subject-public-key` and the algorithm identified by `pop-algorithm`.
 
 # Security Considerations
 
