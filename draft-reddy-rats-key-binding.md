@@ -56,8 +56,6 @@ The claim includes a proof of possession generated using the private key and car
 
 # Introduction
 
-## 1. Introduction
-
 Remote attestation enables an entity to produce attestation evidence that a verifier can use to assess whether the entity’s platform state satisfies a required policy. In certificate enrollment and authentication protocols (e.g., TLS), a common security policy requirement is that a private key used by an endpoint must be generated, stored, and protected within a trusted execution environment (TEE) or comparable hardware root of trust.
 
 In certificate enrollment workflows, a Certification Authority (CA) may require attestation evidence demonstrating that the private key corresponding to the public key in a certificate signing request (CSR) is protected by a hardware-backed environment. The LAMPS CSR Attestation specification {{!I-D.ietf-lamps-csr-attestation}} defines mechanisms for including attestation evidence alongside a CSR. In this model, the CA verifies the CSR signature using the public key contained in the request and independently verifies the attestation evidence according to the RATS architecture, using applicable endorsements and trust anchors.
@@ -74,6 +72,9 @@ Because the attestation evidence and the certificate private key are validated i
 
 Addressing this problem requires a mechanism that provides both proof of possession of the private key and a cryptographic binding between that key and the attested platform state.
 
+A Relying Party will also require additional Claims describing key protection properties, such as non-exportability or hardware-level protection. For example, {{!I-D.ietf-rats-pkix-key-attestation}} defines an Evidence format for reporting properties of cryptographic modules and managed keys in PKIX environments, but it does not provide cryptographic proof of possession of the Subject Key by the Attester.
+
+Appendix A.1.4 of {{RFC9711}} illustrates how a key and key store may be represented in Evidence. However, the example uses private-use claim labels and does not define standardized key-protection Claims or a proof-of-possession mechanism for the attested key. The key-binding claim defined in this document provides a standardized cryptographic binding between the Subject Key and the attested platform state.
 
 # Conventions and Definitions
 
@@ -187,7 +188,7 @@ The claim is defined using CDDL as follows:
 key-binding-claim = {
 subject-public-key: public-key,
 pop-algorithm: int / tstr,
-pop-signature: bstr
+pop-signature: bstr,
 }
 
 public-key = cose-key / jwk
@@ -279,7 +280,15 @@ Such guarantees depend on platform-specific properties and lifecycle management 
 
 # IANA Considerations {#IANA}
 
-TODO
+IANA is requested to register the following claim in the "Entity Attestation Token (EAT) Claims" registry established by {{?RFC9334}}.
+
+Claim Name: key-binding
+
+Claim Key: TBD
+
+CDDL Type: key-binding-claim
+
+Description: Cryptographic binding between a Subject Key and the attested platform state.
 
 # Acknowledgments
 {: numbered="false"}
