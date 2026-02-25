@@ -188,7 +188,7 @@ The claim is defined using CDDL as follows:
 key-binding-claim = {
 subject-public-key: public-key,
 pop-algorithm: int / tstr,
-pop-signature: bstr,
+pop-signature: bstr
 }
 
 public-key = cose-key / jwk
@@ -280,15 +280,23 @@ Such guarantees depend on platform-specific properties and lifecycle management 
 
 # IANA Considerations {#IANA}
 
-IANA is requested to register the following claim in the "Entity Attestation Token (EAT) Claims" registry established by {{?RFC9334}}.
+# IANA Considerations {#IANA}
 
-Claim Name: key-binding
+This document requests registration of a new claim in the following registries:
 
-Claim Key: TBD
+* "CBOR Web Token (CWT) Claims" registry (established by {{RFC8392}})
+* "JSON Web Token Claims" registry (established by {{RFC7519}})
 
-CDDL Type: key-binding-claim
+The following value is to be added to both registries:
 
-Description: Cryptographic binding between a Subject Key and the attested platform state.
+Claim Name: Key Binding
+JWT Claim Name: key_binding
+CWT Claim Key: TBD
+Claim Description: Cryptographic binding between a Subject Key and the attested platform state, including proof of possession of the Subject Key.
+Claim Value Type: map
+Change Controller: IETF
+Reference: RFCXXXX
+
 
 # Acknowledgments
 {: numbered="false"}
