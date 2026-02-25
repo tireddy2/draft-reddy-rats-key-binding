@@ -18,14 +18,14 @@ keyword:
  - Hybrid
  - HPKE
  - Post-Quantum
- 
+
 
 venue:
   group: "RATS"
   type: "Working Group"
   mail: "rats@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/rats/"
-  
+
 
 stand_alone: yes
 pi: [toc, sortrefs, symrefs, strict, comments, docmapping]
@@ -38,13 +38,13 @@ author:
     region: Karnataka
     country: India
     email: "k.tirumaleswar_reddy@nokia.com"
- 
+
 normative:
 
-informative: 
+informative:
 
 
-     
+
 --- abstract
 
 This document defines a new Entity Attestation Token (EAT) claim that cryptographically binds a private key used to sign a certificate signing request (CSR), or the private key corresponding to an end-entity certificate used for TLS authentication, to an attested execution environment.
@@ -65,7 +65,7 @@ A similar problem exists in TLS-based scenarios. The TLS Exported Attestation sp
 
 This separation between validation of attestation evidence and validation of certificate private key creates a class of key substitution attacks. In such an attack:
 
-* A valid attestation produced by a genuine hardware-protected environment is presented to the verifier; and  
+* A valid attestation produced by a genuine hardware-protected environment is presented to the verifier; and
 * A private key that is not generated or protected within that environment is used in the CSR or TLS authentication flow.
 
 Because the attestation evidence and the certificate private key are validated independently, the verifier has no intrinsic cryptographic assurance that the operational private key benefits from the protections described in the attestation. This undermines security policy objectives that require the certificate private key to be generated and constrained within the attested environment.
@@ -112,7 +112,7 @@ The claim provides two properties:
 
 The mechanism operates by embedding a proof-of-possession (PoP) generated using the Subject Key within attestation evidence that is signed by the Attestation Key (AK). Because the attestation evidence is authenticated by the AK, and the PoP is contained within that evidence, successful verification establishes that:
 
-- The attested platform state is authentic; and  
+- The attested platform state is authentic; and
 - The private component of the Subject Key is under the control of the attested environment at the time the evidence was generated.
 
 This construction creates a cryptographic linkage between the Subject Key and the attested platform state, mitigating Key Substitution Attacks.
@@ -147,7 +147,7 @@ The nonce MUST be supplied by the verifier and MUST be unpredictable and unique 
 
 Because the PoP is embedded within AK-signed attestation evidence, successful verification establishes that:
 
-- The attested platform state is authentic; and  
+- The attested platform state is authentic; and
 - The Subject Key is under control of the attested environment at the time the evidence was created.
 
 ## Freshness Requirements
@@ -169,7 +169,7 @@ Upon receipt of attestation evidence containing this claim, the entity responsib
 5. Confirm that the nonce used in the PoP matches the verifier-provided freshness value. If the nonce does not match, the binding verification MUST fail.
 
 6. Compare the Subject Public Key contained in the claim with the public key:
-   - contained in the CSR, in certificate enrollment workflow; or  
+   - contained in the CSR, in certificate enrollment workflow; or
    - contained in the end-entity certificate used for TLS authentication.
 
    If the public key parameters do not match, the binding verification MUST fail.
@@ -196,8 +196,8 @@ public-key = cose-key / jwk
 
 * The `subject-public-key` field contains the public component corresponding to the private key used to generate the `pop-signature`.
 
-* The `pop-algorithm` field identifies the signature algorithm used to generate the `pop-signature`.  
-  When encoded as an integer, the value MUST be taken from the IANA COSE Algorithms registry.  
+* The `pop-algorithm` field identifies the signature algorithm used to generate the `pop-signature`.
+  When encoded as an integer, the value MUST be taken from the IANA COSE Algorithms registry.
   When encoded as a text string, the value MUST correspond to a JOSE `"alg"` identifier.
 
 * In CBOR-based EAT, the public key MUST be encoded as a COSE_Key, the `pop-algorithm` SHOULD be encoded as an integer, and the `pop-signature` MUST be a byte string. In JSON-based EAT, the public key MUST be encoded as a JWK, the `pop-algorithm` SHOULD be encoded as a text string, and the `pop-signature` MUST be Base64URL-encoded.
