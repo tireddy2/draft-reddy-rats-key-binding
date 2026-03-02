@@ -74,7 +74,7 @@ Addressing this problem requires a mechanism that provides both proof of possess
 
 A Relying Party will also require additional Claims describing key protection properties, such as non-exportability or hardware-level protection. For example, {{!I-D.ietf-rats-pkix-key-attestation}} defines an Evidence format for reporting properties of cryptographic modules and managed keys in PKIX environments, but it does not provide cryptographic proof of possession of the Subject Key by the Attester.
 
-Appendix A.1.4 of {{RFC9711}} illustrates how a key and key store may be represented in Evidence. However, the example uses private-use claim labels and does not define standardized key-protection Claims or a proof-of-possession mechanism for the attested key. The key-binding claim defined in this document provides a standardized cryptographic binding between the Subject Key and the attested platform state.
+Appendix A.1.4 of {{!RFC9711}} illustrates how a key and key store may be represented in Evidence. However, the example uses private-use claim labels and does not define standardized key-protection Claims or a proof-of-possession mechanism for the attested key. The key-binding claim defined in this document provides a standardized cryptographic binding between the Subject Key and the attested platform state.
 
 # Conventions and Definitions
 
@@ -280,12 +280,10 @@ Such guarantees depend on platform-specific properties and lifecycle management 
 
 # IANA Considerations {#IANA}
 
-# IANA Considerations {#IANA}
-
 This document requests registration of a new claim in the following registries:
 
-* "CBOR Web Token (CWT) Claims" registry (established by {{RFC8392}})
-* "JSON Web Token Claims" registry (established by {{RFC7519}})
+* "CBOR Web Token (CWT) Claims" registry (established by {{!RFC8392}})
+* "JSON Web Token Claims" registry (established by {{!RFC7519}})
 
 The following value is to be added to both registries:
 
