@@ -3,7 +3,7 @@ title: "A Key Binding Claim for Entity Attestation Tokens (EAT)"
 abbrev: "EAT-KB"
 category: std
 
-docname: draft-reddy-rats-key-binding
+docname: draft-reddy-rats-key-binding-latest
 submissiontype: IETF
 number:
 date:
@@ -72,7 +72,7 @@ Because the attestation evidence and the certificate private key are validated i
 
 Addressing this problem requires a mechanism that provides both proof of possession of the private key and a cryptographic binding between that key and the attested platform state.
 
-A Relying Party will also require additional Claims describing key protection properties, such as non-exportability or hardware-level protection. For example, {{!I-D.ietf-rats-pkix-key-attestation}} defines an Evidence format for reporting properties of cryptographic modules and managed keys in PKIX environments, but it does not provide cryptographic proof of possession of the Subject Key by the Attester.
+A Relying Party will also require additional Claims describing key protection properties, such as non-exportability or hardware-level protection. For example, {{!I-D.ietf-rats-pkix-key-attestation}} defines an Evidence format for reporting properties of cryptographic modules and managed keys in PKIX environments, but it does not provide cryptographic proof of possession of the Subject Key by the Attester. The PKIX Key Attestation specification {{!I-D.ietf-rats-pkix-key-attestation}} defines attributes including extractable, never-extractable, sensitive, and local that describe protection properties of keys managed by cryptographic modules. These attributes can be conveyed together with the key-binding claim defined in this document to allow a verifier to evaluate security policy requirements related to key protection.
 
 Appendix A.1.4 of {{!RFC9711}} illustrates how a key and key store may be represented in Evidence. However, the example uses private-use claim labels and does not define standardized key-protection Claims or a proof-of-possession mechanism for the attested key. The key-binding claim defined in this document provides a standardized cryptographic binding between the Subject Key and the attested platform state.
 
@@ -84,7 +84,7 @@ Attestation Key (AK): A cryptographic key, typically hardware-backed, used to si
 
 Attestation Evidence: Claims about a platform’s state, signed by an Attestation Key, and conveyed in an Entity Attestation Token (EAT).
 
-Entity Attestation Token (EAT): A token format that conveys attestation claims, as defined in {{?RFC9334}}
+Entity Attestation Token (EAT): A token format that conveys attestation claims, as defined in {{?RFC9711}}
 
 Subject Key: An asymmetric key pair for which the protection of the private component within an attested execution environment is being asserted. The private component is used to generate the proof of possession (PoP), and the corresponding public component is conveyed in the claim and compared with the key used in a CSR or TLS end-entity certificate.
 
@@ -113,9 +113,11 @@ The claim provides two properties:
 The mechanism operates by embedding a proof-of-possession (PoP) generated using the Subject Key within attestation evidence that is signed by the Attestation Key (AK). Because the attestation evidence is authenticated by the AK, and the PoP is contained within that evidence, successful verification establishes that:
 
 - The attested platform state is authentic; and
-- The private component of the Subject Key is under the control of the attested environment at the time the evidence was generated.
+- The entity producing the attestation evidence demonstrates control of the private component of the Subject Key at the time the evidence was generated.
 
 This construction creates a cryptographic linkage between the Subject Key and the attested platform state, mitigating Key Substitution Attacks.
+
+The key-binding claim can also include attributes describing key protection properties and permitted usage of the Subject Key. When present, attributes such as extractable, never-extractable, sensitive, and local MUST follow the semantics defined in {{!I-D.ietf-rats-pkix-key-attestation}}. These attributes enable relying parties to enforce policies such as requiring keys to be generated within the attested environment and prohibiting extraction of private key material.
 
 ## High-Level Construction
 
@@ -137,26 +139,43 @@ When these checks succeed, the verifier gains assurance that the certificate pri
 
 The Proof of Possession (PoP) demonstrates control of the private component of the Subject Key at the time the attestation evidence is generated.
 
-The PoP MUST be computed as a digital signature over a verifier-provided nonce using the private component of the Subject Key and the signature algorithm identified by the `pop-algorithm` field.
+The PoP MUST be computed as a digital signature using the private component of the Subject Key and the signature algorithm identified by the `pop-algorithm` field. The input to the signature is the value TBS defined below, which incorporates a verifier-provided nonce. The verifier-provided nonce used as input to the PoP MUST be the same nonce carried in the EAT `nonce` claim defined in {{!RFC9711}}. For the key-binding claim defined in this document, the EAT `nonce` claim MUST contain a single nonce value.
 
 ~~~
-PoP = Sign(subject_private_key, verifier_nonce, pop-algorithm)
+TBS = ("EAT-KB-PoP-v1" || subject_public_key || verifier_nonce)
+PoP = Sign(subject_private_key, TBS, pop-algorithm)
 ~~~
+
+Where:
+
+* "EAT-KB-PoP-v1" is the Context String. 
+* `subject_public_key` is the public key corresponding to the Subject Key contained in 
+  the key-binding claim. For the purpose of TBS computation, the subject_public_key MUST be encoded in the same format as it is represented within the key-binding claim.
+* `verifier_nonce` is the nonce supplied by the verifier and carried in the EAT `nonce` 
+  claim.
+* `SHA-256` is used to produce a fixed-length digest over the concatenated inputs prior 
+  to signature generation.
 
 The nonce MUST be supplied by the verifier and MUST be unpredictable and unique within the verifier’s replay window. The PoP signature MUST be included within the attestation evidence and covered by the Attestation Key signature over the EAT.
 
 Because the PoP is embedded within AK-signed attestation evidence, successful verification establishes that:
 
 - The attested platform state is authentic; and
-- The Subject Key is under control of the attested environment at the time the evidence was created.
+- The entity producing the attestation evidence demonstrates control of the private component of the Subject Key.
+
+The validity period of the key-binding claim is determined by the lifetime of the enclosing Entity Attestation Token. Verifiers MUST enforce the iat, nbf, and exp claims defined in {{!RFC9711}} to ensure that attestation evidence and the associated proof-of-possession are not used outside their intended validity window.
 
 ## Freshness Requirements
 
 The verifier MUST provide a nonce with sufficient entropy to prevent replay. The nonce MUST be unpredictable and unique within the verifier’s replay window. The verifier MUST validate that the nonce contained in the PoP input matches the nonce it supplied. Failure to include verifier-provided freshness renders the mechanism vulnerable to replay of previously valid attestation evidence.
 
+The verifier-provided nonce is the primary mechanism for ensuring freshness of the proof of possession. The EAT time-based claims (`iat`, `nbf`, and `exp`) provide an additional validity window for the attestation evidence but do not replace the requirement for a verifier-provided nonce. Verifiers MUST validate both the nonce and
+the applicable time-based claims when evaluating the key-binding claim.
+
 ## Verification Procedure
 
-Upon receipt of attestation evidence containing this claim, the entity responsible for binding verification (Verifier or Relying Party, depending on deployment architecture) MUST perform the following checks:
+Upon receipt of attestation evidence containing this claim, the Verifier
+MUST perform the following checks:
 
 1. Validate the signature on the EAT using the applicable trust anchors and endorsements for the Attestation Key. If this validation fails, the attestation evidence MUST be rejected.
 
@@ -166,15 +185,15 @@ Upon receipt of attestation evidence containing this claim, the entity responsib
 
 4. Validate the `pop-signature` using the extracted `subject-public-key`, the algorithm identified by `pop-algorithm`, and the verifier-supplied nonce. If signature verification fails, the binding verification MUST fail.
 
-5. Confirm that the nonce used in the PoP matches the verifier-provided freshness value. If the nonce does not match, the binding verification MUST fail.
-
-6. Compare the Subject Public Key contained in the claim with the public key:
+5. Compare the Subject Public Key contained in the claim with the public key:
    - contained in the CSR, in certificate enrollment workflow; or
    - contained in the end-entity certificate used for TLS authentication.
 
    If the public key parameters do not match, the binding verification MUST fail.
 
 Successful completion of all checks establishes a cryptographic binding between the private component corresponding to the public key used in the CSR or TLS end-entity certificate and the attested execution environment at the time the evidence was generated.
+
+The Verifier conveys the result of the binding verification to the Relying Party as part of the attestation result.
 
 # Claim Definition
 
@@ -185,22 +204,34 @@ This document defines a new EAT claim that conveys a cryptographic binding betwe
 The claim is defined using CDDL as follows:
 
 ~~~
-key-binding-claim = {
+key-binding = {
 subject-public-key: public-key,
 pop-algorithm: int / tstr,
-pop-signature: bstr
+pop-signature: bstr,
+
+; Optional key protection attributes 
+? extractable: bool,
+? never-extractable: bool,
+? sensitive: bool,
+? local: bool,
+
+; Optional cryptographic usage constraints
+? purpose: [* oid]
+
 }
 
-public-key = cose-key / jwk
+public-key = COSE_Key / JWK
+; COSE_Key as defined in RFC9052
+; JWK as defined in RFC7517
+oid = tstr  ; dotted-decimal OID string
+
 ~~~
 
 * The `subject-public-key` field contains the public component corresponding to the private key used to generate the `pop-signature`.
 
 * The `pop-algorithm` field identifies the signature algorithm used to generate the `pop-signature`.
-  When encoded as an integer, the value MUST be taken from the IANA COSE Algorithms registry.
-  When encoded as a text string, the value MUST correspond to a JOSE `"alg"` identifier.
 
-* In CBOR-based EAT, the public key MUST be encoded as a COSE_Key, the `pop-algorithm` SHOULD be encoded as an integer, and the `pop-signature` MUST be a byte string. In JSON-based EAT, the public key MUST be encoded as a JWK, the `pop-algorithm` SHOULD be encoded as a text string, and the `pop-signature` MUST be Base64URL-encoded.
+* In CBOR-based EAT, the public key MUST be encoded as a COSE_Key, the `pop-algorithm` MUST be encoded as an integer, and the `pop-signature` MUST be a byte string. In JSON-based EAT, the public key MUST be encoded as a JWK, the `pop-algorithm` MUST be encoded as a text string, and the `pop-signature` MUST be Base64URL-encoded.
 
 The signature algorithm identified by `pop-algorithm` MUST be cryptographically valid for the key type and key material of the `subject-public-key`. For example, an RSA public key MUST NOT be used with an ECDSA or EdDSA signature algorithm, and an elliptic curve public key MUST use a signature algorithm appropriate for its curve. If the algorithm is not compatible with the `subject-public-key`, binding verification MUST fail.
 
@@ -224,6 +255,26 @@ If the comparison fails, the binding verification MUST fail, even if the attesta
 
 The `pop-signature` field contains a digital signature generated using the private component of the Subject Key over the verifier-provided nonce. The signature MUST be generated using the signature algorithm identified by `pop-algorithm`. The `pop-signature` MUST be verifiable using the corresponding `subject-public-key` and the algorithm identified by `pop-algorithm`.
 
+## Key Protection Attributes
+
+The key-binding claim can include attributes describing key protection properties of the private component of the Subject Key.
+
+When present, the attributes `extractable`, `never-extractable`, `sensitive`, and `local` MUST follow the definitions and semantics specified in {{!I-D.ietf-rats-pkix-key-attestation}}.
+
+This document does not redefine these attributes. Their interpretation and security semantics are defined in {{!I-D.ietf-rats-pkix-key-attestation}}.
+
+A Verifier will evaluate these attributes as part of its security policy when determining whether the Subject Key satisfies requirements for key generation, storage, or exportability.
+
+## Purpose
+
+The `purpose` parameter identifies the key capabilities associated with the Subject Key.
+
+The value of this parameter is a list of object identifiers (OIDs) identifying the key capabilities defined in {{!I-D.ietf-rats-pkix-key-attestation}}.
+
+These OIDs correspond to the key capability identifiers defined in Section 5.2.5 of {{!I-D.ietf-rats-pkix-key-attestation}}.
+
+When the key-binding claim is used in certificate enrollment workflows, the reported key capabilities MUST be compatible with the KeyUsage extensions requested in the CSR and included in the issued certificate.
+
 # Security Considerations
 
 ## Threat Model
@@ -238,6 +289,10 @@ The mechanism defined in this document assumes:
 - The verifier provides an unpredictable nonce to ensure freshness.
 
 If these assumptions do not hold, the security guarantees of this mechanism do not apply.
+
+## Proof-of-Possession Rationale
+
+The PoP prevents reliance on self-reported claims about the presence of the Subject Key by requiring the attested environment to demonstrate its ability to perform a cryptographic operation using the private component of that key.
 
 ## Key Substitution Attack Illustration
 
@@ -268,7 +323,7 @@ In deployments using a separate Verifier, the Relying Party MUST require the Ver
 
 ## Scope of Guarantees
 
-This mechanism provides cryptographic evidence that the private component of the Subject Key is under control of the attested execution environment at the time the attestation evidence was generated.
+This mechanism provides cryptographic evidence that the entity producing the attestation evidence demonstrated control of the private component of the Subject Key at the time the evidence was generated.
 
 It does not guarantee:
 
@@ -288,13 +343,12 @@ This document requests registration of a new claim in the following registries:
 The following value is to be added to both registries:
 
 Claim Name: Key Binding
-JWT Claim Name: key_binding
+JWT Claim Name: key-binding
 CWT Claim Key: TBD
-Claim Description: Cryptographic binding between a Subject Key and the attested platform state, including proof of possession of the Subject Key.
-Claim Value Type: map
+Claim Description: Cryptographic binding between a Subject Key and the attested platform state, including a proof-of-possession signature generated by the Subject Key.
+Claim Value Type: CBOR map
 Change Controller: IETF
 Reference: RFCXXXX
-
 
 # Acknowledgments
 {: numbered="false"}
