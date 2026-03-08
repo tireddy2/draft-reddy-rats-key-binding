@@ -145,7 +145,7 @@ The PoP MUST be computed as a digital signature using the private component of t
 context = "EAT-KB-PoP-v1"
 TBS = (context || len(subject_public_key) || subject_public_key ||
       len(verifier_nonce) || verifier_nonce)
-PoP = Sign(subject_private_key, TBS, algorithm(subject-public-key))
+PoP = Sign(subject_private_key, TBS)
 ~~~
 
 Where:
