@@ -59,7 +59,7 @@ The claim includes a proof of possession generated using the private key and car
 Remote attestation enables an entity to produce attestation evidence that a verifier can use to assess whether the entity’s platform state satisfies a required policy. In certificate enrollment and authentication protocols (e.g., TLS), a common security policy requirement is that a private key used by an endpoint must be generated, stored, and protected within a trusted execution environment (TEE) or comparable hardware root of trust.
 
 In certificate enrollment workflows, a Certification Authority (CA) may require attestation evidence demonstrating that the private key corresponding to the public key in a certificate signing request (CSR) is protected by a hardware-backed environment. The LAMPS CSR Attestation specification {{!I-D.ietf-lamps-csr-attestation}} defines mechanisms for including attestation evidence alongside a CSR. In this model, the CA verifies the CSR signature using the public key contained in the request and independently verifies the attestation evidence according to the RATS architecture, using applicable endorsements and trust anchors.
-However, the attestation evidence does not inherently provide a cryptographic proof that the private key used to sign the CSR is the same key that is generated, stored, or protected within the attested environment. The CSR signature demonstrates possession of a private key, and the attestation demonstrates properties of a platform state, but there is no standardized mechanism that cryptographically binds these two validations together. An endpoint could present valid attestation evidence from a protected environment while submitting a certificate signing request (CSR) that is signed with a private key not generated or stored within that environment. In this case, the Certification Authority has no intrinsic cryptographic assurance that the private key corresponding to the CSR public key benefits from the protections described in the attestation evidence.
+However, attestation evidence does not inherently provide a cryptographic proof that the private key used to sign the CSR is the same key that is generated, stored, or protected within the attested environment. The CSR signature demonstrates possession of a private key, and the attestation demonstrates properties of a platform state, but there is no standardized mechanism that cryptographically binds these two validations together. An endpoint could present valid attestation evidence from a protected environment while submitting a certificate signing request (CSR) that is signed with a private key not generated or stored within that environment. In this case, the Certification Authority has no intrinsic cryptographic assurance that the private key corresponding to the CSR public key benefits from the protections described in the attestation evidence.
 
 A similar problem exists in TLS-based scenarios. The TLS Exported Attestation specification {{!I-D.fossati-tls-exported-attestation}} and the TLS Early Attestation specification {{!I-D.fossati-seat-early-attestation}} define mechanisms for conveying attestation evidence within a TLS connection. While the attestation evidence is bound to the TLS connection in these approaches, it does not intrinsically bind the attested environment to the private key corresponding to the end-entity certificate used for TLS authentication. An endpoint could therefore obtain valid attestation evidence from a protected environment while performing certificate-based TLS authentication using a private key that is not confined to that environment. For example, the TLS private key may reside outside the trusted execution environment and lack the protections claimed by the attestation evidence.
 
@@ -139,22 +139,22 @@ When these checks succeed, the verifier gains assurance that the certificate pri
 
 The Proof of Possession (PoP) demonstrates control of the private component of the Subject Key at the time the attestation evidence is generated.
 
-The PoP MUST be computed as a digital signature using the private component of the Subject Key and the signature algorithm identified by the `pop-algorithm` field. The input to the signature is the value TBS defined below, which incorporates a verifier-provided nonce. The verifier-provided nonce used as input to the PoP MUST be the same nonce carried in the EAT `nonce` claim defined in {{!RFC9711}}. For the key-binding claim defined in this document, the EAT `nonce` claim MUST contain a single nonce value.
+The PoP MUST be computed as a digital signature using the private component of the Subject Key. The signature algorithm MUST be the algorithm identified in the `subject-public-key` representation. The input to the signature is the value TBS defined below, which incorporates a verifier-provided nonce. The verifier-provided nonce used as input to the PoP MUST be the same nonce carried in the EAT `nonce` claim defined in {{!RFC9711}}. For the key-binding claim defined in this document, the EAT `nonce` claim MUST contain a single nonce value.
 
 ~~~
-TBS = ("EAT-KB-PoP-v1" || subject_public_key || verifier_nonce)
-PoP = Sign(subject_private_key, TBS, pop-algorithm)
+context = "EAT-KB-PoP-v1"
+TBS = (context || len(subject_public_key) || subject_public_key ||
+      len(verifier_nonce) || verifier_nonce)
+PoP = Sign(subject_private_key, TBS, algorithm(subject-public-key))
 ~~~
 
 Where:
 
-* "EAT-KB-PoP-v1" is the Context String. 
-* `subject_public_key` is the public key corresponding to the Subject Key contained in 
-  the key-binding claim. For the purpose of TBS computation, the subject_public_key MUST be encoded in the same format as it is represented within the key-binding claim.
+* `subject_public_key` is the serialized value of the `subject-public-key` field 
+  contained in the key-binding claim. For the purpose of computing TBS, it MUST be the exact serialized representation of the field as it appears in the claim. The verifier MUST use the same serialized representation when reconstructing TBS.
 * `verifier_nonce` is the nonce supplied by the verifier and carried in the EAT `nonce` 
   claim.
-* `SHA-256` is used to produce a fixed-length digest over the concatenated inputs prior 
-  to signature generation.
+* The len() function encodes the length of the subsequent field as a 4-octet unsigned integer in network byte order.
 
 The nonce MUST be supplied by the verifier and MUST be unpredictable and unique within the verifier’s replay window. The PoP signature MUST be included within the attestation evidence and covered by the Attestation Key signature over the EAT.
 
@@ -179,13 +179,11 @@ MUST perform the following checks:
 
 1. Validate the signature on the EAT using the applicable trust anchors and endorsements for the Attestation Key. If this validation fails, the attestation evidence MUST be rejected.
 
-2. Extract the `subject-public-key`, `pop-algorithm`, and `pop-signature` from the claim.
+2. Extract the `subject-public-key` and `pop-signature` from the claim.
 
-3. Validate that the `pop-algorithm` is compatible with the `subject-public-key`. If the algorithm is not compatible with the key type and associated key material, the binding verification MUST fail. If the algorithm is unknown or unsupported, the binding verification MUST fail.
+3. Validate the `pop-signature` using the extracted `subject-public-key` and the signature algorithm identified by the key representation. The Verifier reconstructs the TBS value using the context string "EAT-KB-PoP-v1", the serialized  `subject-public-key`, the verifier-supplied nonce, and the corresponding length encodings defined in the TBS construction. If signature verification fails, the binding verification MUST fail.
 
-4. Validate the `pop-signature` using the extracted `subject-public-key`, the algorithm identified by `pop-algorithm`, and the verifier-supplied nonce. If signature verification fails, the binding verification MUST fail.
-
-5. Compare the Subject Public Key contained in the claim with the public key:
+4. Compare the Subject Public Key contained in the claim with the public key:
    - contained in the CSR, in certificate enrollment workflow; or
    - contained in the end-entity certificate used for TLS authentication.
 
@@ -206,7 +204,6 @@ The claim is defined using CDDL as follows:
 ~~~
 key-binding = {
 subject-public-key: public-key,
-pop-algorithm: int / tstr,
 pop-signature: bstr,
 
 ; Optional key protection attributes 
@@ -229,12 +226,10 @@ oid = tstr  ; dotted-decimal OID string
 
 * The `subject-public-key` field contains the public component corresponding to the private key used to generate the `pop-signature`.
 
-* The `pop-algorithm` field identifies the signature algorithm used to generate the `pop-signature`.
+* In CBOR-based EAT, the public key MUST be encoded as a COSE_Key and the `pop-signature` MUST be a byte string. In JSON-based EAT, the public key MUST be encoded as a JWK and the `pop-signature` MUST be Base64URL-encoded.
 
-* In CBOR-based EAT, the public key MUST be encoded as a COSE_Key, the `pop-algorithm` MUST be encoded as an integer, and the `pop-signature` MUST be a byte string. In JSON-based EAT, the public key MUST be encoded as a JWK, the `pop-algorithm` MUST be encoded as a text string, and the `pop-signature` MUST be Base64URL-encoded.
-
-The signature algorithm identified by `pop-algorithm` MUST be cryptographically valid for the key type and key material of the `subject-public-key`. For example, an RSA public key MUST NOT be used with an ECDSA or EdDSA signature algorithm, and an elliptic curve public key MUST use a signature algorithm appropriate for its curve. If the algorithm is not compatible with the `subject-public-key`, binding verification MUST fail.
-
+The signature algorithm used to generate the `pop-signature` MUST be identified by the key representation. When the public key is encoded as a JWK, the `alg` parameter defined in {{!RFC7518}} MUST be present and MUST identify the signature algorithm used for the `pop-signature`. When the public key is encoded as a COSE_Key, the `alg` label defined in {{!RFC9052}} MUST be present and MUST identify the signature algorithm
+used for the `pop-signature`.
 
 ## subject-public-key
 
@@ -253,7 +248,7 @@ If the comparison fails, the binding verification MUST fail, even if the attesta
 
 ## pop-signature
 
-The `pop-signature` field contains a digital signature generated using the private component of the Subject Key over the verifier-provided nonce. The signature MUST be generated using the signature algorithm identified by `pop-algorithm`. The `pop-signature` MUST be verifiable using the corresponding `subject-public-key` and the algorithm identified by `pop-algorithm`.
+The `pop-signature` field contains a digital signature generated using the private component of the Subject Key over the TBS value. The signature MUST be generated using the signature algorithm identified in the `subject-public-key`. The `pop-signature` MUST be verifiable using the public key and the algorithm indicated in the `subject-public-key`.
 
 ## Key Protection Attributes
 
@@ -292,7 +287,12 @@ If these assumptions do not hold, the security guarantees of this mechanism do n
 
 ## Proof-of-Possession Rationale
 
-The PoP prevents reliance on self-reported claims about the presence of the Subject Key by requiring the attested environment to demonstrate its ability to perform a cryptographic operation using the private component of that key.
+The AK signature over the EAT provides indirect evidence about the Subject Key. The attested environment reports that the key exists and that it is protected within
+the environment, and the AK signature ensures the integrity and authenticity of those claims.
+
+The PoP defined in this document provides direct evidence of control of the Subject Key. By generating a signature using the private component of the Subject Key over the TBS value, the attested environment demonstrates its ability to perform a cryptographic operation with that key.
+
+By requiring this demonstration, the PoP prevents reliance solely on self-reported claims about the presence of the Subject Key in the attested environment.
 
 ## Key Substitution Attack Illustration
 
