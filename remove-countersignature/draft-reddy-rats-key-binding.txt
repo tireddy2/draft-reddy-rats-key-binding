@@ -28,12 +28,9 @@ Abstract
    signed by a hardware-backed Attestation Key (AK), successful
    verification of the EAT signature together with protocol-level proof
    of possession establishes a cryptographic binding between the private
-   key and the attested platform state.  Optionally, a Platform
-   Attestation Token (PAT) can be embedded or linked using a Conceptual
-   Message Wrapper (CMW) as defined in [I-D.ietf-rats-msg-wrap].  This
-   mechanism addresses key substitution attacks that arise when
-   attestation evidence and the certificate private keys are validated
-   independently.
+   key and the attested platform state.  This mechanism addresses key
+   substitution attacks that arise when attestation evidence and the
+   certificate private keys are validated independently.
 
 About This Document
 
@@ -85,26 +82,22 @@ Table of Contents
    3.  Key Confirmation and Binding Profile
      3.1.  Overview
      3.2.  High-Level Construction
-     3.3.  Optional Linkage to Platform Attestation Token (PAT) via
-           CMW
    4.  Proof-of-Possession
      4.1.  Freshness Requirements
      4.2.  Verification Procedure
    5.  Claim Definition
      5.1.  Claim Structure
      5.2.  Subject Key in cnf
-     5.3.  Optional cmw Claim Usage
-     5.4.  Protocol-Based PoP
-     5.5.  Key Protection Attributes
-     5.6.  Purpose
+     5.3.  Protocol-Based PoP
+     5.4.  Key Protection Attributes
+     5.5.  Purpose
    6.  Security Considerations
      6.1.  Threat Model
      6.2.  Proof-of-Possession Rationale
      6.3.  Key Substitution Attack Illustration
      6.4.  Mitigation of Key Substitution Attacks
-     6.5.  CMW Linkage Security
-     6.6.  Claim Omission and Downgrade
-     6.7.  Scope of Guarantees
+     6.5.  Claim Omission and Downgrade
+     6.6.  Scope of Guarantees
    7.  IANA Considerations
    Acknowledgments
    Normative References
@@ -345,25 +338,6 @@ Table of Contents
    protection within the attested execution environment is being
    asserted.
 
-3.3.  Optional Linkage to Platform Attestation Token (PAT) via CMW
-
-   This profile optionally allows carrying a Platform Attestation Token
-   (PAT) using the CWT cmw claim defined in [I-D.ietf-rats-msg-wrap].
-
-   When the cmw claim is present:
-
-   *  The cmw claim value MUST be a CMW Collection encoded as cbor-
-      collection, following Section 4.3.1 of [I-D.ietf-rats-msg-wrap].
-
-   *  The Collection MUST contain at least one CMW entry that conveys
-      platform attestation Evidence (PAT).
-
-   *  The PAT and the key attestation evidence in this profile MUST be
-      cryptographically bound to the same appraisal context.
-
-   This profile uses nonce linkage for that binding: The PAT nonce claim
-   MUST be present, and its value MUST match the top-level EAT nonce.
-
 4.  Proof-of-Possession
 
    The Proof of Possession (PoP) demonstrates control of the private
@@ -452,17 +426,6 @@ Table of Contents
        If the public key parameters do not match, the binding
        verification MUST fail.
 
-   7.  If the cmw claim is present, validate CMW processing according to
-       [I-D.ietf-rats-msg-wrap], including:
-
-       *  confirmation that cmw is a CMW Collection (cbor-collection);
-
-       *  verification of the PAT Evidence conveyed in the Collection
-          according to the PAT format and trust model; and
-
-       *  verification that PAT and key attestation evidence are bound
-          to the same appraisal context by matching nonce values.
-
    Successful completion of all checks establishes a cryptographic
    binding between the private component corresponding to the public key
    used in the CSR or TLS end-entity certificate and the attested
@@ -543,18 +506,13 @@ Table of Contents
    MUST convey the outcome of the binding verification to the Relying
    Party as part of its appraisal result.
 
-5.3.  Optional cmw Claim Usage
-
-   This document does not define a new cmw claim.  If present, cmw MUST
-   follow the syntax and semantics defined in [I-D.ietf-rats-msg-wrap].
-
-5.4.  Protocol-Based PoP
+5.3.  Protocol-Based PoP
 
    This profile relies on protocol-level proof of possession for the
    Subject Key. This document does not define a new in-token PoP
    container or signature format.
 
-5.5.  Key Protection Attributes
+5.4.  Key Protection Attributes
 
    The key-attributes claim includes attributes describing key
    protection properties of the private component of the Subject Key.
@@ -571,7 +529,7 @@ Table of Contents
    policy when determining whether the Subject Key satisfies
    requirements for key generation, storage, or exportability.
 
-5.6.  Purpose
+5.5.  Purpose
 
    The purpose parameter identifies the key capabilities associated with
    the Subject Key.
@@ -663,18 +621,7 @@ Table of Contents
 
    If any of these validations fail, the binding is not established.
 
-6.5.  CMW Linkage Security
-
-   If the optional cmw claim is used to carry a PAT, Verifiers MUST
-   ensure that the PAT cannot be mixed with an unrelated key attestation
-   token.  Verifiers MUST validate nonce linkage using the mandatory
-   nonce claims.
-
-   Inclusion of PAT in a CMW Collection does not, by itself, establish
-   trust in PAT contents.  Verifiers MUST perform full PAT signature and
-   appraisal verification according to the PAT format and trust model.
-
-6.6.  Claim Omission and Downgrade
+6.5.  Claim Omission and Downgrade
 
    If a security policy requires that the private key corresponding to a
    certificate be generated or protected within an attested execution
@@ -684,17 +631,12 @@ Table of Contents
    protocol-level PoP verification succeeds, and that binding
    verification succeeds.
 
-   If a security policy additionally requires platform attestation
-   linkage via cmw, the Relying Party MUST ensure that a valid PAT is
-   present in cmw and that the linkage checks defined in this profile
-   succeed.
-
    In deployments using a separate Verifier, the Relying Party MUST
    require the Verifier to enforce the presence and successful
    validation of the key-attributes claim, EAT nonce, cnf with COSE_Key,
    and protocol-level PoP verification as part of attestation appraisal.
 
-6.7.  Scope of Guarantees
+6.6.  Scope of Guarantees
 
    This mechanism provides cryptographic evidence that the entity
    participating in the surrounding protocol demonstrated control of the
@@ -754,13 +696,6 @@ Normative References
               Internet-Draft, draft-ietf-lamps-csr-attestation-23, 1
               March 2026, <https://datatracker.ietf.org/doc/html/draft-
               ietf-lamps-csr-attestation-23>.
-
-   [I-D.ietf-rats-msg-wrap]
-              Birkholz, H., Smith, N., Fossati, T., Tschofenig, H., and
-              D. Glaze, "RATS Conceptual Messages Wrapper (CMW)", Work
-              in Progress, Internet-Draft, draft-ietf-rats-msg-wrap-23,
-              11 December 2025, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-rats-msg-wrap-23>.
 
    [I-D.ietf-rats-pkix-key-attestation]
               Ounsworth, M., Fiset, J., Tschofenig, H., Birkholz, H.,
