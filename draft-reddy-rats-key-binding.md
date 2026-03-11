@@ -57,7 +57,7 @@ informative:
 
 This document defines a CWT-based Entity Attestation Token (EAT) profile and a new EAT claim that cryptographically bind a private key used to sign a certificate signing request (CSR), or the private key corresponding to an end-entity certificate used for TLS authentication, to an attested execution environment.
 
-The subject public key is conveyed using the EAT `cnf` claim defined in {{!RFC8747}}, freshness uses the EAT `nonce` claim defined in {{!RFC9711}}, and proof of possession is provided by a COSE countersignature generated with the subject private key. Because the EAT is signed by a hardware-backed Attestation Key (AK), successful verification of both signatures establishes a cryptographic binding between the private key and the attested platform state. Optionally, a Platform Attestation Token (PAT) can be embedded or linked using a Conceptual Message Wrapper (CMW) as defined in {{!I-D.ietf-rats-msg-wrap}}. This mechanism addresses key substitution attacks that arise when attestation evidence and the certificate private keys are validated independently.
+The subject public key is conveyed using the EAT `cnf` claim defined in {{!RFC8747}}, and freshness uses the EAT `nonce` claim defined in {{!RFC9711}}. The proof of possession of the subject key is obtained from the surrounding protocol, such as TLS certificate-based authentication or CSR signature verification. Because the EAT is signed by a hardware-backed Attestation Key (AK), successful verification of the EAT signature together with protocol-level proof of possession establishes a cryptographic binding between the private key and the attested platform state. Optionally, a Platform Attestation Token (PAT) can be embedded or linked using a Conceptual Message Wrapper (CMW) as defined in {{!I-D.ietf-rats-msg-wrap}}. This mechanism addresses key substitution attacks that arise when attestation evidence and the certificate private keys are validated independently.
 
 
 --- middle
@@ -80,9 +80,9 @@ Because the attestation evidence and the certificate private key are validated i
 
 Addressing this problem requires a mechanism that provides both proof of possession of the private key and a cryptographic binding between that key and the attested platform state.
 
-A relying party will also require additional claims describing key protection properties, such as non-exportability or hardware-level protection. For example, {{!I-D.ietf-rats-pkix-key-attestation}} defines an evidence format for reporting properties of cryptographic modules and managed keys in PKIX environments, but it does not provide cryptographic proof of possession of the subject key by the attester. The PKIX Key Attestation specification {{!I-D.ietf-rats-pkix-key-attestation}} defines attributes including extractable, never-extractable, sensitive, and local that describe protection properties of keys managed by cryptographic modules. These attributes can be conveyed using the `key-attributes` claim defined in this document while key confirmation itself is conveyed using `cnf` ({{!RFC8747}}) and a COSE countersignature ({{!RFC9338}}).
+A relying party will also require additional claims describing key protection properties, such as non-exportability or hardware-level protection. For example, {{!I-D.ietf-rats-pkix-key-attestation}} defines an evidence format for reporting properties of cryptographic modules and managed keys in PKIX environments. The PKIX Key Attestation specification {{!I-D.ietf-rats-pkix-key-attestation}} defines attributes including extractable, never-extractable, sensitive, and local that describe protection properties of keys managed by cryptographic modules. These attributes can be conveyed using the `key-attributes` claim defined in this document while key confirmation itself is conveyed using `cnf` ({{!RFC8747}}) and protocol-level proof of possession.
 
-Appendix A.1.4 of {{!RFC9711}} illustrates how a key and key store may be represented in evidence. However, the example uses private-use claim labels and does not define standardized key-protection claims or a proof-of-possession mechanism for the attested key. This specification uses the standardized `cnf` claim from {{!RFC8747}} together with a COSE countersignature from {{!RFC9338}} and defines a new claim for key-protection attributes and usage constraints.
+Appendix A.1.4 of {{!RFC9711}} illustrates how a key and key store may be represented in evidence. However, the example uses private-use claim labels and does not define standardized key-protection claims. This specification uses the standardized `cnf` claim from {{!RFC8747}} and defines a new claim for key-protection attributes and usage constraints, while relying on protocol-level proof of possession.
 
 # Conventions and Definitions
 
@@ -100,9 +100,9 @@ Attestation Evidence: Claims about a platform's state, signed by an Attestation 
 
 Entity Attestation Token (EAT): A token format that conveys attestation claims, as defined in {{?RFC9711}}
 
-Subject Key: An asymmetric key pair for which the protection of the private component within an attested execution environment is being asserted. The private component is used to generate the proof of possession (PoP), and the corresponding public component is conveyed in the EAT `cnf` claim and compared with the key used in a CSR or TLS end-entity certificate.
+Subject Key: An asymmetric key pair for which the protection of the private component within an attested execution environment is being asserted. The corresponding public component is conveyed in the EAT `cnf` claim and compared with the key used in a CSR or TLS end-entity certificate.
 
-Proof of Possession (PoP): A digital signature generated using the private component of the Subject Key to demonstrate control of that private key at a given point in time.
+Proof of Possession (PoP): Evidence that demonstrates control of the private component of the Subject Key at a given point in time. In this profile, PoP is obtained from the surrounding protocol (for example, TLS certificate-based authentication or CSR signature verification).
 
 Verifier: The entity that validates attestation evidence and evaluates whether the platform state and associated keys satisfy its policy.
 
@@ -124,15 +124,15 @@ The profile provides two properties:
 1. Proof of Possession : Demonstration that the entity presenting the attestation controls the private component of the Subject Key.
 2. Key-to-Platform Binding : Cryptographic association between the private component of the Subject Key and the attested platform state.
 
-The mechanism operates using two signatures over the same EAT:
+The mechanism combines:
 
 - an EAT signature generated by the Attestation Key (AK); and
-- a COSE countersignature generated by the private component of the Subject Key.
+- protocol-level proof of possession for the Subject Key.
 
-The subject public key used to verify the countersignature is carried in the EAT `cnf` claim as a `COSE_Key`, following {{!RFC8747}}. Because the attestation evidence is authenticated by the AK, and the countersignature provides PoP for the Subject Key, successful verification establishes that:
+The subject public key used for protocol-level PoP verification is carried in the EAT `cnf` claim as a `COSE_Key`, following {{!RFC8747}}. Because the attestation evidence is authenticated by the AK, and PoP is verified in the surrounding protocol, successful verification establishes that:
 
 - The attested platform state is authentic; and
-- The entity producing the attestation evidence demonstrates control of the private component of the Subject Key at the time the evidence was generated.
+- The entity participating in the surrounding protocol demonstrates control of the private component of the Subject Key during protocol execution.
 
 This construction creates a cryptographic linkage between the Subject Key and the attested platform state, mitigating Key Substitution Attacks.
 
@@ -140,7 +140,7 @@ The `key-attributes` claim conveys attributes describing key protection properti
 
 ## High-Level Construction
 
-At a high level, the mechanism binds a certificate private key to an attested execution environment through a dual-signature construction.
+At a high level, the mechanism binds a certificate private key to an attested execution environment by combining AK-signed attestation evidence and protocol-level proof of possession.
 
 First, the attester constructs an EAT Claims Set including:
 
@@ -150,12 +150,10 @@ First, the attester constructs an EAT Claims Set including:
 
 Second, the EAT is signed using the Attestation Key.
 
-Third, a COSE countersignature is generated using the private component of the Subject Key and attached to the EAT as specified by {{!RFC9338}}.
-
 During verification, three relationships are checked:
 
 - The digitally signed and protected EAT establishes that the platform state is authentic.
-- The countersignature establishes control of the private component of the Subject Key.
+- The protocol-level PoP check establishes control of the private component of the Subject Key.
 - The public key in `cnf` is compared with the public key in the CSR or TLS end-entity certificate to ensure they refer to the same operational key.
 
 When these checks succeed, the verifier gains assurance that the certificate private key used in the protocol is the same key whose protection within the attested execution environment is being asserted.
@@ -174,20 +172,20 @@ This profile uses nonce linkage for that binding: The PAT nonce claim MUST be pr
 
 # Proof-of-Possession
 
-The Proof of Possession (PoP) demonstrates control of the private component of the Subject Key at the time the attestation evidence is generated.
+The Proof of Possession (PoP) demonstrates control of the private component of the Subject Key.
 
-PoP is provided by a COSE countersignature as defined in {{!RFC9338}} over the EAT object. The countersignature MUST be generated using the private component of the Subject Key, and the corresponding public key MUST be carried in the EAT `cnf` claim as a `COSE_Key` according to {{!RFC8747}}.
+In this profile, PoP MUST be verified by the surrounding protocol:
+
+- In certificate enrollment workflows, by validating the CSR signature.
+- In TLS workflows, by validating certificate-based TLS authentication.
+
+The public key used for protocol-level PoP verification MUST correspond to the Subject Public Key in EAT `cnf`.
 
 For this profile, the EAT `nonce` claim defined in {{!RFC9711}} is the mandatory freshness mechanism. The EAT `nonce` claim MUST be present and MUST contain a single nonce value supplied by the verifier.
 
 The nonce MUST be supplied by the verifier and MUST be unpredictable and unique within the verifier's replay window.
 
-Because PoP is conveyed as a countersignature on the AK-signed EAT, successful verification establishes that:
-
-- The attested platform state is authentic.
-- The entity producing the attestation evidence demonstrates control of the private component of the Subject Key.
-
-The validity period of the key attestation evidence is determined by the lifetime of the enclosing EAT. Verifiers MUST enforce the `iat`, `nbf`, and `exp` claims defined in {{!RFC9711}} to ensure that attestation evidence and the associated proof of possession are not used outside their intended validity window.
+The validity period of the key attestation evidence is determined by the lifetime of the enclosing EAT. Verifiers MUST enforce the `iat`, `nbf`, and `exp` claims defined in {{!RFC9711}} to ensure that attestation evidence is not used outside its intended validity window.
 
 ## Freshness Requirements
 
@@ -207,9 +205,13 @@ Upon receipt of attestation evidence for this profile, the Verifier MUST perform
 
 4. Extract the Subject Public Key from the EAT `cnf` claim. This profile requires the `cnf` claim defined in {{!RFC8747}} and requires `cnf` to contain `COSE_Key`. Use of `Encrypted_COSE_Key` or a `kid`-only representation is outside the scope of this profile.
 
-5. Validate the COSE countersignature using the extracted Subject Public Key. A countersignature MUST be present. If countersignature verification fails, the binding verification MUST fail.
+5. Verify proof of possession of the Subject Key using the surrounding protocol:
+   - in certificate enrollment workflows, validate the CSR signature; or
+   - in TLS workflows, validate certificate-based TLS authentication.
 
-6. Compare the Subject Public Key contained in `cnf` with the public key:
+   If protocol-level PoP verification fails, the binding verification MUST fail.
+
+6. Compare the Subject Public Key contained in `cnf` with the public key used for protocol-level PoP verification.
    - contained in the CSR, in certificate enrollment workflow; or
    - contained in the end-entity certificate used for TLS authentication.
 
@@ -270,9 +272,9 @@ If the comparison fails, the binding verification MUST fail, even if the attesta
 
 This document does not define a new `cmw` claim. If present, `cmw` MUST follow the syntax and semantics defined in {{!I-D.ietf-rats-msg-wrap}}.
 
-## COSE Countersignature
+## Protocol-Based PoP
 
-This profile requires a COSE countersignature as defined in {{!RFC9338}} to provide proof of possession of the Subject Key. The countersignature MUST be verifiable using the Subject Public Key from `cnf`.
+This profile relies on protocol-level proof of possession for the Subject Key. This document does not define a new in-token PoP container or signature format.
 
 ## Key Protection Attributes
 
@@ -304,18 +306,16 @@ The mechanism defined in this document assumes:
 
 - The AK is securely provisioned and protected.
 - The AK correctly signs attestation evidence reflecting the platform state.
-- The Subject Key private component is accessible only within the protected execution environment at the time the PoP is generated.
+- The surrounding protocol correctly verifies proof of possession of the Subject Key private component.
 - The verifier provides an unpredictable nonce to ensure freshness.
 
 If these assumptions do not hold, the security guarantees of this mechanism do not apply.
 
 ## Proof-of-Possession Rationale
 
-The AK signature over the EAT provides indirect evidence about the Subject Key. The attested environment reports that the key exists and that it is protected within the environment, and the AK signature ensures the integrity and authenticity of those claims.
+The AK signature over the EAT provides evidence about the Subject Key and its asserted protection properties. Protocol-level PoP verification provides direct evidence of control of the Subject Key.
 
-The PoP defined in this document provides direct evidence of control of the Subject Key. By generating a COSE countersignature using the private component of the Subject Key over the EAT object, the attested environment demonstrates its ability to perform a cryptographic operation with that key.
-
-By requiring this demonstration, the PoP prevents reliance solely on self-reported claims about the presence of the Subject Key in the attested environment.
+By requiring both checks, the profile prevents reliance solely on self-reported claims about the presence of the Subject Key in the attested environment.
 
 ## Key Substitution Attack Illustration
 
@@ -332,7 +332,7 @@ Because the public keys do not match, the binding verification fails. Although t
 
 This mechanism mitigates Key Substitution Attacks by requiring cryptographic proof that the private key used in a CSR or TLS authentication flow corresponds to the key whose protection within the attested execution environment is being asserted.
 
-Because proof of possession is conveyed by a countersignature and validated together with the EAT signature, and because the claimed Subject Public Key in `cnf` must match the public key contained in the CSR or in the TLS end-entity certificate, substitution of a private key that is not generated or protected within the attested execution environment is detected.
+Because protocol-level proof of possession is validated together with the EAT signature, and because the claimed Subject Public Key in `cnf` must match the public key used in the protocol, substitution of a private key that is not generated or protected within the attested execution environment is detected.
 
 If any of these validations fail, the binding is not established.
 
@@ -344,16 +344,16 @@ Inclusion of PAT in a CMW Collection does not, by itself, establish trust in PAT
 
 ## Claim Omission and Downgrade
 
-If a security policy requires that the private key corresponding to a certificate be generated or protected within an attested execution environment, the Relying Party MUST ensure that the `key-attributes` claim defined in this document is present, that the EAT `nonce` claim is present, that the `cnf` claim is present with `COSE_Key`, that a valid countersignature is present, and that binding verification succeeds.
+If a security policy requires that the private key corresponding to a certificate be generated or protected within an attested execution environment, the Relying Party MUST ensure that the `key-attributes` claim defined in this document is present, that the EAT `nonce` claim is present, that the `cnf` claim is present with `COSE_Key`, that protocol-level PoP verification succeeds, and that binding verification succeeds.
 
 If a security policy additionally requires platform attestation linkage via `cmw`, the Relying Party MUST ensure that a valid PAT is present in `cmw` and that the linkage checks defined in this profile succeed.
 
-In deployments using a separate Verifier, the Relying Party MUST require the Verifier to enforce the presence and successful validation of the `key-attributes` claim, EAT `nonce`, `cnf` with `COSE_Key`, and the countersignature as part of attestation appraisal.
+In deployments using a separate Verifier, the Relying Party MUST require the Verifier to enforce the presence and successful validation of the `key-attributes` claim, EAT `nonce`, `cnf` with `COSE_Key`, and protocol-level PoP verification as part of attestation appraisal.
 
 
 ## Scope of Guarantees
 
-This mechanism provides cryptographic evidence that the entity producing the attestation evidence demonstrated control of the private component of the Subject Key at the time the evidence was generated.
+This mechanism provides cryptographic evidence that the entity participating in the surrounding protocol demonstrated control of the private component of the Subject Key during protocol execution.
 
 It does not guarantee:
 
