@@ -4,20 +4,20 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>A Key Binding Claim for Entity Attestation Tokens (EAT)</title>
+<title>Key Attestation for Entity Attestation Tokens (EAT)</title>
 <meta content="Tirumaleswar Reddy" name="author">
+<meta content="Hannes Tschofenig" name="author">
 <meta content="
-       This document defines a new Entity Attestation Token (EAT) claim that cryptographically binds a private key used to sign a certificate signing request (CSR), or the private key corresponding to an end-entity certificate used for TLS authentication, to an attested execution environment. 
-       The claim includes a proof of possession generated using the private key and carried within the EAT. Because the EAT is signed by a hardware-backed Attestation Key (AK), successful verification of both the signature on the EAT and the proof of possession establishes a cryptographic binding between the private key and the attested platform state. This mechanism addresses key substitution attacks that arise when attestation evidence and certificate private key are validated independently. 
+       This document defines a CWT-based Entity Attestation Token (EAT) profile and a new EAT claim that cryptographically bind a private key used to sign a certificate signing request (CSR), or the private key corresponding to an end-entity certificate used for TLS authentication, to an attested execution environment. 
+       The subject public key is conveyed using the EAT  cnf  claim defined in  , freshness uses the EAT  nonce  claim defined in  , and proof of possession is provided by a COSE countersignature generated with the subject private key. Because the EAT is signed by a hardware-backed Attestation Key (AK), successful verification of both signatures establishes a cryptographic binding between the private key and the attested platform state. Optionally, a Platform Attestation Token (PAT) can be embedded or linked using a Conceptual Message Wrapper (CMW) as defined in  . This mechanism addresses key substitution attacks that arise when attestation evidence and the certificate private keys are validated independently. 
     " name="description">
 <meta content="xml2rfc 3.31.0" name="generator">
 <meta content="PQC" name="keyword">
 <meta content="COSE" name="keyword">
-<meta content="JOSE" name="keyword">
 <meta content="Hybrid" name="keyword">
 <meta content="HPKE" name="keyword">
 <meta content="Post-Quantum" name="keyword">
-<meta content="draft-reddy-rats-key-binding" name="ietf.draft">
+<meta content="draft-reddy-rats-key-binding-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.31.0
     Python 3.12.12
@@ -1050,12 +1050,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <table class="ears">
 <thead><tr>
 <td class="left">Internet-Draft</td>
-<td class="center">EAT-KB</td>
-<td class="right">February 2026</td>
+<td class="center">EAT Key Attestation</td>
+<td class="right">March 2026</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Reddy</td>
-<td class="center">Expires 21 August 2026</td>
+<td class="left">Reddy &amp; Tschofenig</td>
+<td class="center">Expires 12 September 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1065,29 +1065,33 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dt class="label-workgroup">Workgroup:</dt>
 <dd class="workgroup">RATS</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-reddy-rats-key-binding</dd>
+<dd class="internet-draft">draft-reddy-rats-key-binding-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-02-17" class="published">17 February 2026</time>
+<time datetime="2026-03-11" class="published">11 March 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-08-21">21 August 2026</time></dd>
-<dt class="label-authors">Author:</dt>
+<dd class="expires"><time datetime="2026-09-12">12 September 2026</time></dd>
+<dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
       <div class="author-name">T. Reddy</div>
 <div class="org">Nokia</div>
 </div>
+<div class="author">
+      <div class="author-name">H. Tschofenig</div>
+<div class="org">UniBw M.</div>
+</div>
 </dd>
 </dl>
 </div>
-<h1 id="title">A Key Binding Claim for Entity Attestation Tokens (EAT)</h1>
+<h1 id="title">Key Attestation for Entity Attestation Tokens (EAT)</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document defines a new Entity Attestation Token (EAT) claim that cryptographically binds a private key used to sign a certificate signing request (CSR), or the private key corresponding to an end-entity certificate used for TLS authentication, to an attested execution environment.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">The claim includes a proof of possession generated using the private key and carried within the EAT. Because the EAT is signed by a hardware-backed Attestation Key (AK), successful verification of both the signature on the EAT and the proof of possession establishes a cryptographic binding between the private key and the attested platform state. This mechanism addresses key substitution attacks that arise when attestation evidence and certificate private key are validated independently.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document defines a CWT-based Entity Attestation Token (EAT) profile and a new EAT claim that cryptographically bind a private key used to sign a certificate signing request (CSR), or the private key corresponding to an end-entity certificate used for TLS authentication, to an attested execution environment.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">The subject public key is conveyed using the EAT <code>cnf</code> claim defined in <span>[<a href="#RFC8747" class="cite xref">RFC8747</a>]</span>, freshness uses the EAT <code>nonce</code> claim defined in <span>[<a href="#RFC9711" class="cite xref">RFC9711</a>]</span>, and proof of possession is provided by a COSE countersignature generated with the subject private key. Because the EAT is signed by a hardware-backed Attestation Key (AK), successful verification of both signatures establishes a cryptographic binding between the private key and the attested platform state. Optionally, a Platform Attestation Token (PAT) can be embedded or linked using a Conceptual Message Wrapper (CMW) as defined in <span>[<a href="#I-D.ietf-rats-msg-wrap" class="cite xref">I-D.ietf-rats-msg-wrap</a>]</span>. This mechanism addresses key substitution attacks that arise when attestation evidence and the certificate private keys are validated independently.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1095,7 +1099,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
       </h2>
 <p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
 <p id="section-note.1-2">
-        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-reddy-rats-key/">https://datatracker.ietf.org/doc/draft-reddy-rats-key/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-reddy-rats-key-binding/">https://datatracker.ietf.org/doc/draft-reddy-rats-key-binding/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
 <p id="section-note.1-3">
         Discussion of this document takes place on the
         RATS Working Group mailing list (<span><a href="mailto:rats@ietf.org">mailto:rats@ietf.org</a></span>),
@@ -1121,7 +1125,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 21 August 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 12 September 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1152,23 +1156,21 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
             <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
-                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-1-introduction" class="internal xref">1. Introduction</a></p>
-</li>
-            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
             <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-key-confirmation-and-bindin" class="internal xref">Key Confirmation and Binding Claim</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-key-confirmation-and-bindin" class="internal xref">Key Confirmation and Binding Profile</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
-                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-overview" class="internal xref">Overview</a></p>
+                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-overview" class="internal xref">Overview</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
                 <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-high-level-construction" class="internal xref">High-Level Construction</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-optional-linkage-to-platfor" class="internal xref">Optional Linkage to Platform Attestation Token (PAT) via CMW</a></p>
 </li>
             </ul>
 </li>
@@ -1190,10 +1192,19 @@ svg :is([fill="white"], [fill^="#fff"]) {
                 <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-claim-structure" class="internal xref">Claim Structure</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
-                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-subject-public-key" class="internal xref">subject-public-key</a></p>
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-subject-key-in-cnf" class="internal xref">Subject Key in cnf</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
-                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-pop-signature" class="internal xref">pop-signature</a></p>
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-optional-cmw-claim-usage" class="internal xref">Optional cmw Claim Usage</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
+                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-cose-countersignature" class="internal xref">COSE Countersignature</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5">
+                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-key-protection-attributes" class="internal xref">Key Protection Attributes</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.6">
+                <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="auto internal xref">5.6</a>.  <a href="#name-purpose" class="internal xref">Purpose</a></p>
 </li>
             </ul>
 </li>
@@ -1204,19 +1215,22 @@ svg :is([fill="white"], [fill^="#fff"]) {
                 <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-threat-model" class="internal xref">Threat Model</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
-                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-key-substitution-attack-ill" class="internal xref">Key Substitution Attack Illustration</a></p>
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-proof-of-possession-rationa" class="internal xref">Proof-of-Possession Rationale</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
-                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-mitigation-of-key-substitut" class="internal xref">Mitigation of Key Substitution Attacks</a></p>
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-key-substitution-attack-ill" class="internal xref">Key Substitution Attack Illustration</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
-                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-freshness-and-replay" class="internal xref">Freshness and Replay</a></p>
+                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-mitigation-of-key-substitut" class="internal xref">Mitigation of Key Substitution Attacks</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5">
-                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-claim-omission-and-downgrad" class="internal xref">Claim Omission and Downgrade</a></p>
+                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-cmw-linkage-security" class="internal xref">CMW Linkage Security</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.6">
-                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-scope-of-guarantees" class="internal xref">Scope of Guarantees</a></p>
+                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-claim-omission-and-downgrad" class="internal xref">Claim Omission and Downgrade</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.7">
+                <p id="section-toc.1-1.6.2.7.1"><a href="#section-6.7" class="auto internal xref">6.7</a>.  <a href="#name-scope-of-guarantees" class="internal xref">Scope of Guarantees</a></p>
 </li>
             </ul>
 </li>
@@ -1227,18 +1241,10 @@ svg :is([fill="white"], [fill^="#fff"]) {
             <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref"></a><a href="#name-references" class="internal xref">References</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
-                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref"></a><a href="#name-normative-references" class="internal xref">Normative References</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
-                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref"></a><a href="#name-informative-references" class="internal xref">Informative References</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref"></a><a href="#name-normative-references" class="internal xref">Normative References</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1249,29 +1255,23 @@ svg :is([fill="white"], [fill^="#fff"]) {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<div id="introduction-1">
-<section id="section-1.1">
-        <h3 id="name-1-introduction">
-<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-1-introduction" class="section-name selfRef">1. Introduction</a>
-        </h3>
-<p id="section-1.1-1">Remote attestation enables an entity to produce attestation evidence that a verifier can use to assess whether the entity’s platform state satisfies a required policy. In certificate enrollment and authentication protocols (e.g., TLS), a common security policy requirement is that a private key used by an endpoint must be generated, stored, and protected within a trusted execution environment (TEE) or comparable hardware root of trust.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
-<p id="section-1.1-2">In certificate enrollment workflows, a Certification Authority (CA) may require attestation evidence demonstrating that the private key corresponding to the public key in a certificate signing request (CSR) is protected by a hardware-backed environment. The LAMPS CSR Attestation specification <span>[<a href="#I-D.ietf-lamps-csr-attestation" class="cite xref">I-D.ietf-lamps-csr-attestation</a>]</span> defines mechanisms for including attestation evidence alongside a CSR. In this model, the CA verifies the CSR signature using the public key contained in the request and independently verifies the attestation evidence according to the RATS architecture, using applicable endorsements and trust anchors.
-However, the attestation evidence does not inherently provide a cryptographic proof that the private key used to sign the CSR is the same key that is generated, stored, or protected within the attested environment. The CSR signature demonstrates possession of a private key, and the attestation demonstrates properties of a platform state, but there is no standardized mechanism that cryptographically binds these two validations together. An endpoint could present valid attestation evidence from a protected environment while submitting a certificate signing request (CSR) that is signed with a private key not generated or stored within that environment. In this case, the Certification Authority has no intrinsic cryptographic assurance that the private key corresponding to the CSR public key benefits from the protections described in the attestation evidence.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
-<p id="section-1.1-3">A similar structural gap exists in transport-layer scenarios. The TLS Exported Attestation specification 
-<span>[<a href="#I-D.fossati-tls-exported-attestation" class="cite xref">I-D.fossati-tls-exported-attestation</a>]</span> defines mechanisms for conveying attestation evidence within a TLS session. While the attestation evidence is bound to the TLS handshake transcript, it does not intrinsically bind the attested environment to the private key corresponding to the end-entity certificate used for TLS authentication. An endpoint could therefore obtain valid attestation evidence from a protected environment while performing certificate-based TLS authentication using a private key that is not confined to that environment. For example, the TLS private key may reside outside the trusted execution environment and lack the protections claimed by the attestation evidence.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
-<p id="section-1.1-4">This separation between validation of attestation evidence and validation of certificate private key creates a class of key substitution attacks. In such an attack:<a href="#section-1.1-4" class="pilcrow">¶</a></p>
+<p id="section-1-1">Remote attestation enables an entity to produce attestation evidence that a verifier can use to assess whether the entity’s platform state satisfies a required policy. In certificate enrollment and authentication protocols (e.g., TLS), a common security policy requirement is that a private key used by an endpoint must be generated, stored, and protected within a trusted execution environment (TEE) or comparable hardware root of trust.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">In certificate enrollment workflows, a Certification Authority (CA) may require attestation evidence demonstrating that the private key corresponding to the public key in a certificate signing request (CSR) is protected by a hardware-backed environment. The LAMPS CSR Attestation specification <span>[<a href="#I-D.ietf-lamps-csr-attestation" class="cite xref">I-D.ietf-lamps-csr-attestation</a>]</span> defines mechanisms for including attestation evidence alongside a CSR. In this model, the CA verifies the CSR signature using the public key contained in the request and independently verifies the attestation evidence according to the RATS architecture, using applicable endorsements and trust anchors.
+However, attestation evidence does not inherently provide a cryptographic proof that the private key used to sign the CSR is the same key that is generated, stored, or protected within the attested environment. The CSR signature demonstrates possession of a private key, and the attestation demonstrates properties of a platform state, but there is no standardized mechanism that cryptographically binds these two validations together. An endpoint could present valid attestation evidence from a protected environment while submitting a certificate signing request (CSR) that is signed with a private key not generated or stored within that environment. In this case, the Certification Authority has no intrinsic cryptographic assurance that the private key corresponding to the CSR public key benefits from the protections described in the attestation evidence.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">A similar problem exists in TLS-based scenarios. The TLS Exported Attestation specification <span>[<a href="#I-D.fossati-tls-exported-attestation" class="cite xref">I-D.fossati-tls-exported-attestation</a>]</span> and the TLS Early Attestation specification <span>[<a href="#I-D.fossati-seat-early-attestation" class="cite xref">I-D.fossati-seat-early-attestation</a>]</span> define mechanisms for conveying attestation evidence within a TLS connection. While the attestation evidence is bound to the TLS connection in these approaches, it does not intrinsically bind the attested environment to the private key corresponding to the end-entity certificate used for TLS authentication. An endpoint could therefore obtain valid attestation evidence from a protected environment while performing certificate-based TLS authentication using a private key that is not confined to that environment. For example, the TLS private key may reside outside the trusted execution environment and lack the protections claimed by the attestation evidence.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">This separation between validation of attestation evidence and validation of certificate private key creates a class of key substitution attacks. In such an attack:<a href="#section-1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-1.1-5.1">
-            <p id="section-1.1-5.1.1">A valid attestation produced by a genuine hardware-protected environment is presented to the verifier; and<a href="#section-1.1-5.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-1-5.1">
+          <p id="section-1-5.1.1">A valid attestation produced by a genuine hardware-protected environment is presented to the verifier; and<a href="#section-1-5.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-1.1-5.2">
-            <p id="section-1.1-5.2.1">A private key that is not generated or protected within that environment is used in the CSR or TLS authentication flow.<a href="#section-1.1-5.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-1-5.2">
+          <p id="section-1-5.2.1">A private key that is not generated or protected within that environment is used in the CSR or TLS authentication flow.<a href="#section-1-5.2.1" class="pilcrow">¶</a></p>
 </li>
-        </ul>
-<p id="section-1.1-6">Because the attestation evidence and the certificate private key are validated independently, the verifier has no intrinsic cryptographic assurance that the operational private key benefits from the protections described in the attestation. This undermines security policy objectives that require the certificate private key to be generated and constrained within the attested environment.<a href="#section-1.1-6" class="pilcrow">¶</a></p>
-<p id="section-1.1-7">Addressing this problem requires a mechanism that provides both proof of possession of the private key and a cryptographic binding between that key and the attested platform state.<a href="#section-1.1-7" class="pilcrow">¶</a></p>
-</section>
-</div>
+      </ul>
+<p id="section-1-6">Because the attestation evidence and the certificate private key are validated independently, the verifier has no intrinsic cryptographic assurance that the operational private key benefits from the protections described in the attestation evidence. This undermines security policy objectives that require the certificate private key to be generated and constrained within the attested environment.<a href="#section-1-6" class="pilcrow">¶</a></p>
+<p id="section-1-7">Addressing this problem requires a mechanism that provides both proof of possession of the private key and a cryptographic binding between that key and the attested platform state.<a href="#section-1-7" class="pilcrow">¶</a></p>
+<p id="section-1-8">A relying party will also require additional claims describing key protection properties, such as non-exportability or hardware-level protection. For example, <span>[<a href="#I-D.ietf-rats-pkix-key-attestation" class="cite xref">I-D.ietf-rats-pkix-key-attestation</a>]</span> defines an evidence format for reporting properties of cryptographic modules and managed keys in PKIX environments, but it does not provide cryptographic proof of possession of the subject key by the attester. The PKIX Key Attestation specification <span>[<a href="#I-D.ietf-rats-pkix-key-attestation" class="cite xref">I-D.ietf-rats-pkix-key-attestation</a>]</span> defines attributes including extractable, never-extractable, sensitive, and local that describe protection properties of keys managed by cryptographic modules. These attributes can be conveyed using the <code>key-attributes</code> claim defined in this document while key confirmation itself is conveyed using <code>cnf</code> (<span>[<a href="#RFC8747" class="cite xref">RFC8747</a>]</span>) and a COSE countersignature (<span>[<a href="#RFC9338" class="cite xref">RFC9338</a>]</span>).<a href="#section-1-8" class="pilcrow">¶</a></p>
+<p id="section-1-9">Appendix A.1.4 of <span>[<a href="#RFC9711" class="cite xref">RFC9711</a>]</span> illustrates how a key and key store may be represented in evidence. However, the example uses private-use claim labels and does not define standardized key-protection claims or a proof-of-possession mechanism for the attested key. This specification uses the standardized <code>cnf</code> claim from <span>[<a href="#RFC8747" class="cite xref">RFC8747</a>]</span> together with a COSE countersignature from <span>[<a href="#RFC9338" class="cite xref">RFC9338</a>]</span> and defines a new claim for key-protection attributes and usage constraints.<a href="#section-1-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1283,29 +1283,33 @@ However, the attestation evidence does not inherently provide a cryptographic pr
 "<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
 described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
 appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
-<p id="section-2-2">Attestation Key (AK): A cryptographic key, typically hardware-backed, used to sign attestation evidence that conveys claims about the state of a platform or trusted execution environment.<a href="#section-2-2" class="pilcrow">¶</a></p>
-<p id="section-2-3">Attestation Evidence: Claims about a platform’s state, signed by an Attestation Key, and conveyed in an Entity Attestation Token (EAT).<a href="#section-2-3" class="pilcrow">¶</a></p>
-<p id="section-2-4">Entity Attestation Token (EAT): A token format that conveys attestation claims, as defined in <span>[<a href="#RFC9334" class="cite xref">RFC9334</a>]</span><a href="#section-2-4" class="pilcrow">¶</a></p>
-<p id="section-2-5">Subject Key: An asymmetric key pair for which the protection of the private component within an attested execution environment is being asserted. The private component is used to generate the proof of possession (PoP), and the corresponding public component is conveyed in the claim and compared with the key used in a CSR or TLS end-entity certificate.<a href="#section-2-5" class="pilcrow">¶</a></p>
-<p id="section-2-6">Proof of Possession (PoP): A digital signature generated using the private component of the Subject Key to demonstrate control of thatprivate key at a given point in time.<a href="#section-2-6" class="pilcrow">¶</a></p>
-<p id="section-2-7">Verifier: The entity that validates attestation evidence and evaluates whether the platform state and associated keys satisfy its policy.<a href="#section-2-7" class="pilcrow">¶</a></p>
-<p id="section-2-8">Certification Authority (CA): An entity that issues certificates and may require attestation evidence during certificate enrollment.<a href="#section-2-8" class="pilcrow">¶</a></p>
-<p id="section-2-9">Trusted Execution Environment (TEE): An isolated execution context that provides confidentiality and integrity protections for code and data, including cryptographic key material.<a href="#section-2-9" class="pilcrow">¶</a></p>
-<p id="section-2-10">Key Substitution Attack: An attack in which valid attestation evidence from a protected execution environment is presented to a verifier, while a private key used in a CSR or authentication protocol is not generated or protected within that environment. Because attestation evidence and certificate private key are validated independently, the verifier may lack cryptographic assurance that the certificate private key benefits from the protections claimed in the attestation.<a href="#section-2-10" class="pilcrow">¶</a></p>
+<p id="section-2-2">The reader is assumed to be familiar with the vocabulary and concepts defined in the RATS Architecture (<span>[<a href="#RFC9334" class="cite xref">RFC9334</a>]</span>) such as Attester, Relying Party, Verifier.<a href="#section-2-2" class="pilcrow">¶</a></p>
+<p id="section-2-3">The reader is assumed to be familiar with common vocabulary and concepts defined in <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> such as certificate, signature, attribute, verification and validation.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-4">The following terms are used in this document:<a href="#section-2-4" class="pilcrow">¶</a></p>
+<p id="section-2-5">Attestation Key (AK): A cryptographic key, typically hardware-backed, used to sign attestation evidence that conveys claims about the state of a platform or trusted execution environment.<a href="#section-2-5" class="pilcrow">¶</a></p>
+<p id="section-2-6">Attestation Evidence: Claims about a platform's state, signed by an Attestation Key, and conveyed in an Entity Attestation Token (EAT).<a href="#section-2-6" class="pilcrow">¶</a></p>
+<p id="section-2-7">Entity Attestation Token (EAT): A token format that conveys attestation claims, as defined in <span>[<a href="#RFC9711" class="cite xref">RFC9711</a>]</span><a href="#section-2-7" class="pilcrow">¶</a></p>
+<p id="section-2-8">Subject Key: An asymmetric key pair for which the protection of the private component within an attested execution environment is being asserted. The private component is used to generate the proof of possession (PoP), and the corresponding public component is conveyed in the EAT <code>cnf</code> claim and compared with the key used in a CSR or TLS end-entity certificate.<a href="#section-2-8" class="pilcrow">¶</a></p>
+<p id="section-2-9">Proof of Possession (PoP): A digital signature generated using the private component of the Subject Key to demonstrate control of that private key at a given point in time.<a href="#section-2-9" class="pilcrow">¶</a></p>
+<p id="section-2-10">Verifier: The entity that validates attestation evidence and evaluates whether the platform state and associated keys satisfy its policy.<a href="#section-2-10" class="pilcrow">¶</a></p>
+<p id="section-2-11">Certification Authority (CA): An entity that issues certificates and may require attestation evidence during certificate enrollment.<a href="#section-2-11" class="pilcrow">¶</a></p>
+<p id="section-2-12">Trusted Execution Environment (TEE): An isolated execution context that provides confidentiality and integrity protections for code and data, including cryptographic key material.<a href="#section-2-12" class="pilcrow">¶</a></p>
+<p id="section-2-13">Key Substitution Attack: An attack in which valid attestation evidence from a protected execution environment is presented to a verifier, while a private key used in a CSR or authentication protocol is not generated or protected within that environment. Because attestation evidence and certificate private key are validated independently, the verifier may lack cryptographic assurance that the certificate private key benefits from the protections claimed in the attestation.<a href="#section-2-13" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="key-confirmation-and-binding-claim">
+<div id="key-confirmation-and-binding-profile">
 <section id="section-3">
       <h2 id="name-key-confirmation-and-bindin">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-key-confirmation-and-bindin" class="section-name selfRef">Key Confirmation and Binding Claim</a>
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-key-confirmation-and-bindin" class="section-name selfRef">Key Confirmation and Binding Profile</a>
       </h2>
 <div id="overview">
 <section id="section-3.1">
         <h3 id="name-overview">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
         </h3>
-<p id="section-3.1-1">This document defines a new EAT claim that establishes a cryptographic binding between a Subject Key and an attested execution environment.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.1-2">The claim provides two properties:<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-1">This document defines a CWT-based EAT profile and a new EAT claim that establish a cryptographic binding between a Subject Key and an attested execution environment.
+The profile is defined for EAT conveyed as a CWT Claims Set in a <code>COSE_Sign1</code> message.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">The profile provides two properties:<a href="#section-3.1-2" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-3.1-3">
 <li id="section-3.1-3.1">
             <p id="section-3.1-3.1.1">Proof of Possession : Demonstration that the entity presenting the attestation controls the private component of the Subject Key.<a href="#section-3.1-3.1.1" class="pilcrow">¶</a></p>
@@ -1314,16 +1318,26 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
             <p id="section-3.1-3.2.1">Key-to-Platform Binding : Cryptographic association between the private component of the Subject Key and the attested platform state.<a href="#section-3.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-3.1-4">The mechanism operates by embedding a proof-of-possession (PoP) generated using the Subject Key within attestation evidence that is signed by the Attestation Key (AK). Because the attestation evidence is authenticated by the AK, and the PoP is contained within that evidence, successful verification establishes that:<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<p id="section-3.1-4">The mechanism operates using two signatures over the same EAT:<a href="#section-3.1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-5.1">
-            <p id="section-3.1-5.1.1">The attested platform state is authentic; and<a href="#section-3.1-5.1.1" class="pilcrow">¶</a></p>
+            <p id="section-3.1-5.1.1">an EAT signature generated by the Attestation Key (AK); and<a href="#section-3.1-5.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.1-5.2">
-            <p id="section-3.1-5.2.1">The private component of the Subject Key is under the control of the attested environment at the time the evidence was generated.<a href="#section-3.1-5.2.1" class="pilcrow">¶</a></p>
+            <p id="section-3.1-5.2.1">a COSE countersignature generated by the private component of the Subject Key.<a href="#section-3.1-5.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-3.1-6">This construction creates a cryptographic linkage between the Subject Key and the attested platform state, mitigating Key Substitution Attacks.<a href="#section-3.1-6" class="pilcrow">¶</a></p>
+<p id="section-3.1-6">The subject public key used to verify the countersignature is carried in the EAT <code>cnf</code> claim as a <code>COSE_Key</code>, following <span>[<a href="#RFC8747" class="cite xref">RFC8747</a>]</span>. Because the attestation evidence is authenticated by the AK, and the countersignature provides PoP for the Subject Key, successful verification establishes that:<a href="#section-3.1-6" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.1-7.1">
+            <p id="section-3.1-7.1.1">The attested platform state is authentic; and<a href="#section-3.1-7.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-7.2">
+            <p id="section-3.1-7.2.1">The entity producing the attestation evidence demonstrates control of the private component of the Subject Key at the time the evidence was generated.<a href="#section-3.1-7.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.1-8">This construction creates a cryptographic linkage between the Subject Key and the attested platform state, mitigating Key Substitution Attacks.<a href="#section-3.1-8" class="pilcrow">¶</a></p>
+<p id="section-3.1-9">The <code>key-attributes</code> claim conveys attributes describing key protection properties and permitted usage of the Subject Key. The <code>key-attributes</code> claim <span class="bcp14">MUST</span> be present and <span class="bcp14">MUST</span> contain at least one member. When present, attributes such as extractable, never-extractable, sensitive, and local <span class="bcp14">MUST</span> follow the semantics defined in <span>[<a href="#I-D.ietf-rats-pkix-key-attestation" class="cite xref">I-D.ietf-rats-pkix-key-attestation</a>]</span>. These attributes enable relying parties to enforce policies such as requiring keys to be generated within the attested environment and prohibiting extraction of private key material.<a href="#section-3.1-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="high-level-construction">
@@ -1331,22 +1345,55 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         <h3 id="name-high-level-construction">
 <a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-high-level-construction" class="section-name selfRef">High-Level Construction</a>
         </h3>
-<p id="section-3.2-1">At a high level, the mechanism binds a certificate private key to an attested execution environment through a nested signature structure.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.2-2">First, the private component of the Subject Key generates a signature over a verifier-provided nonce. This signature demonstrates possession of the private key at the time the attestation evidence is created.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
-<p id="section-3.2-3">Next, the corresponding public key and the resulting proof of possession are included as part of the Entity Attestation Token (EAT). The EAT itself is signed by the Attestation Key, which authenticates the platform state.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
-<p id="section-3.2-4">During verification, three relationships are checked:<a href="#section-3.2-4" class="pilcrow">¶</a></p>
+<p id="section-3.2-1">At a high level, the mechanism binds a certificate private key to an attested execution environment through a dual-signature construction.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">First, the attester constructs an EAT Claims Set including:<a href="#section-3.2-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2-5.1">
-            <p id="section-3.2-5.1.1">The signature on the EAT establishes that the attested platform state is authentic.<a href="#section-3.2-5.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.2-3.1">
+            <p id="section-3.2-3.1.1">the verifier-provided <code>nonce</code> claim from <span>[<a href="#RFC9711" class="cite xref">RFC9711</a>]</span>;<a href="#section-3.2-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-3.2-5.2">
-            <p id="section-3.2-5.2.1">The proof of possession establishes control of the private key.<a href="#section-3.2-5.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-3.2-3.2">
+            <p id="section-3.2-3.2.1">the <code>cnf</code> claim from <span>[<a href="#RFC8747" class="cite xref">RFC8747</a>]</span> containing the Subject Public Key as <code>COSE_Key</code>;<a href="#section-3.2-3.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-3.2-5.3">
-            <p id="section-3.2-5.3.1">The public key included in the claim is compared with the public key in the CSR or TLS end-entity certificate to ensure they refer to the same operational key.<a href="#section-3.2-5.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-3.2-3.3">
+            <p id="section-3.2-3.3.1">the <code>key-attributes</code> claim defined in this document.<a href="#section-3.2-3.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-3.2-6">When these checks succeed, the verifier gains assurance that the certificate private key used in the protocol is the same key whose protection within the attested execution environment is being asserted.<a href="#section-3.2-6" class="pilcrow">¶</a></p>
+<p id="section-3.2-4">Second, the EAT is signed using the Attestation Key.<a href="#section-3.2-4" class="pilcrow">¶</a></p>
+<p id="section-3.2-5">Third, a COSE countersignature is generated using the private component of the Subject Key and attached to the EAT as specified by <span>[<a href="#RFC9338" class="cite xref">RFC9338</a>]</span>.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
+<p id="section-3.2-6">During verification, three relationships are checked:<a href="#section-3.2-6" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2-7.1">
+            <p id="section-3.2-7.1.1">The digitally signed and protected EAT establishes that the platform state is authentic.<a href="#section-3.2-7.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.2-7.2">
+            <p id="section-3.2-7.2.1">The countersignature establishes control of the private component of the Subject Key.<a href="#section-3.2-7.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.2-7.3">
+            <p id="section-3.2-7.3.1">The public key in <code>cnf</code> is compared with the public key in the CSR or TLS end-entity certificate to ensure they refer to the same operational key.<a href="#section-3.2-7.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.2-8">When these checks succeed, the verifier gains assurance that the certificate private key used in the protocol is the same key whose protection within the attested execution environment is being asserted.<a href="#section-3.2-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="optional-linkage-to-platform-attestation-token-pat-via-cmw">
+<section id="section-3.3">
+        <h3 id="name-optional-linkage-to-platfor">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-optional-linkage-to-platfor" class="section-name selfRef">Optional Linkage to Platform Attestation Token (PAT) via CMW</a>
+        </h3>
+<p id="section-3.3-1">This profile optionally allows carrying a Platform Attestation Token (PAT) using the CWT <code>cmw</code> claim defined in <span>[<a href="#I-D.ietf-rats-msg-wrap" class="cite xref">I-D.ietf-rats-msg-wrap</a>]</span>.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2">When the <code>cmw</code> claim is present:<a href="#section-3.3-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.3-3.1">
+            <p id="section-3.3-3.1.1">The <code>cmw</code> claim value <span class="bcp14">MUST</span> be a CMW Collection encoded as <code>cbor-collection</code>, following Section 4.3.1 of <span>[<a href="#I-D.ietf-rats-msg-wrap" class="cite xref">I-D.ietf-rats-msg-wrap</a>]</span>.<a href="#section-3.3-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.3-3.2">
+            <p id="section-3.3-3.2.1">The Collection <span class="bcp14">MUST</span> contain at least one CMW entry that conveys platform attestation Evidence (PAT).<a href="#section-3.3-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.3-3.3">
+            <p id="section-3.3-3.3.1">The PAT and the key attestation evidence in this profile <span class="bcp14">MUST</span> be cryptographically bound to the same appraisal context.<a href="#section-3.3-3.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.3-4">This profile uses nonce linkage for that binding: The PAT nonce claim <span class="bcp14">MUST</span> be present, and its value <span class="bcp14">MUST</span> match the top-level EAT <code>nonce</code>.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1357,24 +1404,26 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-proof-of-possession" class="section-name selfRef">Proof-of-Possession</a>
       </h2>
 <p id="section-4-1">The Proof of Possession (PoP) demonstrates control of the private component of the Subject Key at the time the attestation evidence is generated.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">The PoP <span class="bcp14">MUST</span> be computed as a digital signature over a verifier-provided nonce.<a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3">PoP = Sign_subject_key(verifier_nonce)<a href="#section-4-3" class="pilcrow">¶</a></p>
-<p id="section-4-4">The nonce <span class="bcp14">MUST</span> be supplied by the verifier and <span class="bcp14">MUST</span> be unpredictable and unique within the verifier’s replay window. The PoP signature <span class="bcp14">MUST</span> be included within the attestation evidence and covered by the Attestation Key signature over the EAT.<a href="#section-4-4" class="pilcrow">¶</a></p>
-<p id="section-4-5">Because the PoP is embedded within AK-signed attestation evidence, successful verification establishes that:<a href="#section-4-5" class="pilcrow">¶</a></p>
+<p id="section-4-2">PoP is provided by a COSE countersignature as defined in <span>[<a href="#RFC9338" class="cite xref">RFC9338</a>]</span> over the EAT object. The countersignature <span class="bcp14">MUST</span> be generated using the private component of the Subject Key, and the corresponding public key <span class="bcp14">MUST</span> be carried in the EAT <code>cnf</code> claim as a <code>COSE_Key</code> according to <span>[<a href="#RFC8747" class="cite xref">RFC8747</a>]</span>.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">For this profile, the EAT <code>nonce</code> claim defined in <span>[<a href="#RFC9711" class="cite xref">RFC9711</a>]</span> is the mandatory freshness mechanism. The EAT <code>nonce</code> claim <span class="bcp14">MUST</span> be present and <span class="bcp14">MUST</span> contain a single nonce value supplied by the verifier.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-4">The nonce <span class="bcp14">MUST</span> be supplied by the verifier and <span class="bcp14">MUST</span> be unpredictable and unique within the verifier's replay window.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<p id="section-4-5">Because PoP is conveyed as a countersignature on the AK-signed EAT, successful verification establishes that:<a href="#section-4-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-4-6.1">
-          <p id="section-4-6.1.1">The attested platform state is authentic; and<a href="#section-4-6.1.1" class="pilcrow">¶</a></p>
+          <p id="section-4-6.1.1">The attested platform state is authentic.<a href="#section-4-6.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-4-6.2">
-          <p id="section-4-6.2.1">The Subject Key was under control of the attested environment at the time the evidence was created.<a href="#section-4-6.2.1" class="pilcrow">¶</a></p>
+          <p id="section-4-6.2.1">The entity producing the attestation evidence demonstrates control of the private component of the Subject Key.<a href="#section-4-6.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
+<p id="section-4-7">The validity period of the key attestation evidence is determined by the lifetime of the enclosing EAT. Verifiers <span class="bcp14">MUST</span> enforce the <code>iat</code>, <code>nbf</code>, and <code>exp</code> claims defined in <span>[<a href="#RFC9711" class="cite xref">RFC9711</a>]</span> to ensure that attestation evidence and the associated proof of possession are not used outside their intended validity window.<a href="#section-4-7" class="pilcrow">¶</a></p>
 <div id="freshness-requirements">
 <section id="section-4.1">
         <h3 id="name-freshness-requirements">
 <a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-freshness-requirements" class="section-name selfRef">Freshness Requirements</a>
         </h3>
-<p id="section-4.1-1">The verifier <span class="bcp14">MUST</span> provide a nonce with sufficient entropy to prevent replay. The nonce <span class="bcp14">MUST</span> be unpredictable and unique within the verifier’s replay window. The verifier <span class="bcp14">MUST</span> validate that the nonce contained in the PoP input matches the nonce it supplied. Failure to include verifier-provided freshness renders the mechanism vulnerable to replay of previously valid attestation evidence.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-1">The verifier <span class="bcp14">MUST</span> provide a nonce with sufficient entropy to prevent replay. The nonce <span class="bcp14">MUST</span> be unpredictable and unique within the verifier's replay window. The verifier <span class="bcp14">MUST</span> validate that the nonce claim in the EAT matches the nonce it supplied. Failure to include verifier-provided freshness renders the mechanism vulnerable to replay of previously valid attestation evidence.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">The verifier-provided nonce is the primary mechanism for ensuring freshness of the proof of possession. The EAT time-based claims (<code>iat</code>, <code>nbf</code>, and <code>exp</code>) provide an additional validity window for the attestation evidence but do not replace the requirement for a verifier-provided nonce. Verifiers <span class="bcp14">MUST</span> validate both the nonce and the applicable time-based claims when evaluating this profile.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="verification-procedure">
@@ -1382,35 +1431,53 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         <h3 id="name-verification-procedure">
 <a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-verification-procedure" class="section-name selfRef">Verification Procedure</a>
         </h3>
-<p id="section-4.2-1">Upon receipt of attestation evidence containing this claim, the entity responsible for binding verification (Verifier or Relying Party, depending on deployment architecture) <span class="bcp14">MUST</span> perform the following checks:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-1">Upon receipt of attestation evidence for this profile, the Verifier <span class="bcp14">MUST</span> perform the following checks:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-4.2-2">
 <li id="section-4.2-2.1">
             <p id="section-4.2-2.1.1">Validate the signature on the EAT using the applicable trust anchors and endorsements for the Attestation Key. If this validation fails, the attestation evidence <span class="bcp14">MUST</span> be rejected.<a href="#section-4.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-4.2-2.2">
-            <p id="section-4.2-2.2.1">Extract the Subject Public Key and the Proof of Possession (PoP) from the claim.<a href="#section-4.2-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-4.2-2.2.1">Validate the <code>key-attributes</code> claim. The <code>key-attributes</code> claim <span class="bcp14">MUST</span> be present and <span class="bcp14">MUST</span> contain at least one member.<a href="#section-4.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-4.2-2.3">
-            <p id="section-4.2-2.3.1">Validate the PoP signature using the extracted Subject Public Key and the verifier-supplied nonce. If signature verification fails, the binding verification <span class="bcp14">MUST</span> fail.<a href="#section-4.2-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-4.2-2.3.1">Validate the EAT <code>nonce</code> claim. The EAT <code>nonce</code> claim <span class="bcp14">MUST</span> be present, <span class="bcp14">MUST</span> contain a single nonce value, and <span class="bcp14">MUST</span> match the verifier-supplied nonce.<a href="#section-4.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-4.2-2.4">
-            <p id="section-4.2-2.4.1">Confirm that the nonce used in the PoP matches the verifier-provided freshness value. If the nonce does not match, the binding verification <span class="bcp14">MUST</span> fail.<a href="#section-4.2-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-4.2-2.4.1">Extract the Subject Public Key from the EAT <code>cnf</code> claim. This profile requires the <code>cnf</code> claim defined in <span>[<a href="#RFC8747" class="cite xref">RFC8747</a>]</span> and requires <code>cnf</code> to contain <code>COSE_Key</code>. Use of <code>Encrypted_COSE_Key</code> or a <code>kid</code>-only representation is outside the scope of this profile.<a href="#section-4.2-2.4.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-4.2-2.5">
-            <p id="section-4.2-2.5.1">Compare the Subject Public Key contained in the claim with the public key:<a href="#section-4.2-2.5.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-4.2-2.5.2.1">
-                <p id="section-4.2-2.5.2.1.1">contained in the CSR, in certificate enrollment workflows; or<a href="#section-4.2-2.5.2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-4.2-2.5.1">Validate the COSE countersignature using the extracted Subject Public Key. A countersignature <span class="bcp14">MUST</span> be present. If countersignature verification fails, the binding verification <span class="bcp14">MUST</span> fail.<a href="#section-4.2-2.5.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-4.2-2.5.2.2">
-                <p id="section-4.2-2.5.2.2.1">contained in the end-entity certificate used for TLS authentication.<a href="#section-4.2-2.5.2.2.1" class="pilcrow">¶</a></p>
+          <li id="section-4.2-2.6">
+            <p id="section-4.2-2.6.1">Compare the Subject Public Key contained in <code>cnf</code> with the public key:<a href="#section-4.2-2.6.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.2-2.6.2.1">
+                <p id="section-4.2-2.6.2.1.1">contained in the CSR, in certificate enrollment workflow; or<a href="#section-4.2-2.6.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.2-2.6.2.2">
+                <p id="section-4.2-2.6.2.2.1">contained in the end-entity certificate used for TLS authentication.<a href="#section-4.2-2.6.2.2.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
-<p id="section-4.2-2.5.3">
-This comparison <span class="bcp14">MUST</span> be performed using a canonical representation suitable for unambiguous equality checking. If the keys do not match exactly, the binding verification <span class="bcp14">MUST</span> fail.<a href="#section-4.2-2.5.3" class="pilcrow">¶</a></p>
+<p id="section-4.2-2.6.3">
+If the public key parameters do not match, the binding verification <span class="bcp14">MUST</span> fail.<a href="#section-4.2-2.6.3" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-4.2-2.7">
+            <p id="section-4.2-2.7.1">If the <code>cmw</code> claim is present, validate CMW processing according to <span>[<a href="#I-D.ietf-rats-msg-wrap" class="cite xref">I-D.ietf-rats-msg-wrap</a>]</span>, including:<a href="#section-4.2-2.7.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.2-2.7.2.1">
+                <p id="section-4.2-2.7.2.1.1">confirmation that <code>cmw</code> is a CMW Collection (<code>cbor-collection</code>);<a href="#section-4.2-2.7.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.2-2.7.2.2">
+                <p id="section-4.2-2.7.2.2.1">verification of the PAT Evidence conveyed in the Collection according to the PAT format and trust model; and<a href="#section-4.2-2.7.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.2-2.7.2.3">
+                <p id="section-4.2-2.7.2.3.1">verification that PAT and key attestation evidence are bound to the same appraisal context by matching nonce values.<a href="#section-4.2-2.7.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
 </li>
         </ol>
-<p id="section-4.2-3">Successful completion of all checks establishes a cryptographic binding between the private component corresponding to the operational certificate key and the attested execution environment at the time the evidence was generated.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">Successful completion of all checks establishes a cryptographic binding between the private component corresponding to the public key used in the CSR or TLS end-entity certificate and the attested execution environment at the time the evidence was generated.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-4">The Verifier conveys the result of the binding verification to the Relying Party as part of the attestation result.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1420,29 +1487,41 @@ This comparison <span class="bcp14">MUST</span> be performed using a canonical r
       <h2 id="name-claim-definition">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-claim-definition" class="section-name selfRef">Claim Definition</a>
       </h2>
-<p id="section-5-1">This document defines a new EAT claim that conveys a cryptographic binding between a Subject Key and the attested platform state.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-1">This document defines a new EAT claim named <code>key-attributes</code> that conveys key protection attributes and key-usage constraints for the Subject Key.<a href="#section-5-1" class="pilcrow">¶</a></p>
 <div id="claim-structure">
 <section id="section-5.1">
         <h3 id="name-claim-structure">
 <a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-claim-structure" class="section-name selfRef">Claim Structure</a>
         </h3>
 <p id="section-5.1-1">The claim is defined using CDDL as follows:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1-2">key-binding-claim = {
-subject-public-key: public-key,
-pop-signature: bstr
-}<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.1-3">public-key = cose-key / jwk<a href="#section-5.1-3" class="pilcrow">¶</a></p>
-<p id="section-5.1-4">In CBOR-based EAT, the public key <span class="bcp14">MUST</span> be encoded as a COSE_Key and the pop-signature <span class="bcp14">MUST</span> be a byte string. In JSON-based EAT, the public key <span class="bcp14">MUST</span> be encoded as a JWK and the pop-signature <span class="bcp14">MUST</span> be a Base64URL-encoded string.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
-<p id="section-5.1-5">To ensure unambiguous verification, the subject-public-key <span class="bcp14">MUST</span> include an algorithm identifier (alg parameter in COSE/JWK) specifying the signature scheme used to generate the pop-signature.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.1-2">
+<pre>
+key-attributes = {
+; Optional key protection attributes
+? extractable: bool,
+? never-extractable: bool,
+? sensitive: bool,
+? local: bool,
+
+; Optional cryptographic usage constraints
+? purpose: [* oid]
+
+}
+
+oid = tstr  ; dotted-decimal OID string
+
+</pre><a href="#section-5.1-2" class="pilcrow">¶</a>
+</div>
+<p id="section-5.1-3">The <code>key-attributes</code> claim <span class="bcp14">MUST</span> contain at least one member.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="subject-public-key">
+<div id="subject-key-in-cnf">
 <section id="section-5.2">
-        <h3 id="name-subject-public-key">
-<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-subject-public-key" class="section-name selfRef">subject-public-key</a>
+        <h3 id="name-subject-key-in-cnf">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-subject-key-in-cnf" class="section-name selfRef">Subject Key in cnf</a>
         </h3>
-<p id="section-5.2-1">The <code>subject-public-key</code> field contains the public key corresponding to the private key used to generate the Proof of Possession (PoP).<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2">When comparing the subject-public-key contained in the claim with the public key used in a CSR or TLS end-entity certificate, the comparison <span class="bcp14">MUST</span> be performed over the mathematical public key parameters rather than over their serialized encodings. This ensures that differences in wire formats (e.g., ASN.1 DER vs. CBOR) do not result in false negatives.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">This profile uses the EAT <code>cnf</code> claim defined in <span>[<a href="#RFC8747" class="cite xref">RFC8747</a>]</span> to carry the Subject Public Key. The <code>cnf</code> claim <span class="bcp14">MUST</span> be present and <span class="bcp14">MUST</span> contain a <code>COSE_Key</code> member.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">When comparing the Subject Public Key contained in <code>cnf</code> with the public key used in a CSR or TLS end-entity certificate, the comparison <span class="bcp14">MUST</span> be performed over the public key parameters rather than over their serialized encodings. This ensures that differences in encoding formats (e.g., ASN.1 DER versus CBOR) do not cause two equivalent public keys to be incorrectly treated as unequal.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2-3">For example:<a href="#section-5.2-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.2-4.1">
@@ -1452,19 +1531,51 @@ pop-signature: bstr
             <p id="section-5.2-4.2.1">For elliptic curve keys: The curve identifier and public key coordinates (e.g., x and y values) <span class="bcp14">MUST</span> match. If an implementation supports point compression, keys <span class="bcp14">MUST</span> be decompressed to a common format before the comparison is performed.<a href="#section-5.2-4.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.2-4.3">
-            <p id="section-5.2-4.3.1">For other key types: The public key parameters defined by the relevant specification (e.g., base points, polynomial coefficients) <span class="bcp14">MUST</span> match exactly. Comparison based solely on serialized encodings (e.g., raw CBOR, JSON, or DER byte sequences) is <span class="bcp14">NOT RECOMMENDED</span>, as it is prone to failure due to different encoding rules or metadata across protocols.<a href="#section-5.2-4.3.1" class="pilcrow">¶</a></p>
+            <p id="section-5.2-4.3.1">For ML-DSA, SLH-DSA, and FN-DSA keys: The comparison <span class="bcp14">MUST</span> be performed over the raw public key byte string defined by the relevant algorithm specification (e.g., FIPS-204 for ML-DSA). In <code>cnf</code>, the Verifier <span class="bcp14">MUST</span> extract the raw public key bytes from the <code>pub</code> parameter of that structure. In an X.509 certificate <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>, the public key is carried in the SubjectPublicKeyInfo structure. The Verifier <span class="bcp14">MUST</span> extract the contents of the <code>subjectPublicKey</code> BIT STRING and obtain the contained public key byte string. The raw public key byte string extracted from <code>cnf</code> and the byte string extracted from the certificate <span class="bcp14">MUST</span> match exactly.<a href="#section-5.2-4.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.2-4.4">
+            <p id="section-5.2-4.4.1">For other key types: The public key parameters defined by the relevant cryptographic specification <span class="bcp14">MUST</span> match exactly. Comparison based solely on serialized encodings (e.g., raw CBOR, JSON, or DER byte sequences) is <span class="bcp14">NOT RECOMMENDED</span>, as differences in encoding rules may cause equivalent keys to appear unequal.<a href="#section-5.2-4.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-5.2-5">If the comparison fails, the binding verification <span class="bcp14">MUST</span> fail, even if the attestation evidence itself is otherwise valid. The Verifier <span class="bcp14">MUST</span> convey the outcome of the binding verification to the Relying Party as part of its appraisal result.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="pop-signature">
+<div id="optional-cmw-claim-usage">
 <section id="section-5.3">
-        <h3 id="name-pop-signature">
-<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-pop-signature" class="section-name selfRef">pop-signature</a>
+        <h3 id="name-optional-cmw-claim-usage">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-optional-cmw-claim-usage" class="section-name selfRef">Optional cmw Claim Usage</a>
         </h3>
-<p id="section-5.3-1">The <code>pop-signature</code> field contains a digital signature generated using the private component of the Subject Key.
-The signature <span class="bcp14">MUST</span> be computed over the verifier-provided nonce and <span class="bcp14">MUST</span> be verifiable using the corresponding <code>subject-public-key</code> included in the claim.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.3-1">This document does not define a new <code>cmw</code> claim. If present, <code>cmw</code> <span class="bcp14">MUST</span> follow the syntax and semantics defined in <span>[<a href="#I-D.ietf-rats-msg-wrap" class="cite xref">I-D.ietf-rats-msg-wrap</a>]</span>.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="cose-countersignature">
+<section id="section-5.4">
+        <h3 id="name-cose-countersignature">
+<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-cose-countersignature" class="section-name selfRef">COSE Countersignature</a>
+        </h3>
+<p id="section-5.4-1">This profile requires a COSE countersignature as defined in <span>[<a href="#RFC9338" class="cite xref">RFC9338</a>]</span> to provide proof of possession of the Subject Key. The countersignature <span class="bcp14">MUST</span> be verifiable using the Subject Public Key from <code>cnf</code>.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="key-protection-attributes">
+<section id="section-5.5">
+        <h3 id="name-key-protection-attributes">
+<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-key-protection-attributes" class="section-name selfRef">Key Protection Attributes</a>
+        </h3>
+<p id="section-5.5-1">The <code>key-attributes</code> claim includes attributes describing key protection properties of the private component of the Subject Key.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-2">When present, the attributes <code>extractable</code>, <code>never-extractable</code>, <code>sensitive</code>, and <code>local</code> <span class="bcp14">MUST</span> follow the definitions and semantics specified in <span>[<a href="#I-D.ietf-rats-pkix-key-attestation" class="cite xref">I-D.ietf-rats-pkix-key-attestation</a>]</span>.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
+<p id="section-5.5-3">This document does not redefine these attributes. Their interpretation and security semantics are defined in <span>[<a href="#I-D.ietf-rats-pkix-key-attestation" class="cite xref">I-D.ietf-rats-pkix-key-attestation</a>]</span>.<a href="#section-5.5-3" class="pilcrow">¶</a></p>
+<p id="section-5.5-4">A Verifier will evaluate these attributes as part of its security policy when determining whether the Subject Key satisfies requirements for key generation, storage, or exportability.<a href="#section-5.5-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="purpose">
+<section id="section-5.6">
+        <h3 id="name-purpose">
+<a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-purpose" class="section-name selfRef">Purpose</a>
+        </h3>
+<p id="section-5.6-1">The <code>purpose</code> parameter identifies the key capabilities associated with the Subject Key.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
+<p id="section-5.6-2">The value of this parameter is a list of object identifiers (OIDs) identifying the key capabilities defined in <span>[<a href="#I-D.ietf-rats-pkix-key-attestation" class="cite xref">I-D.ietf-rats-pkix-key-attestation</a>]</span>.<a href="#section-5.6-2" class="pilcrow">¶</a></p>
+<p id="section-5.6-3">These OIDs correspond to the key capability identifiers defined in Section 5.2.5 of <span>[<a href="#I-D.ietf-rats-pkix-key-attestation" class="cite xref">I-D.ietf-rats-pkix-key-attestation</a>]</span>.<a href="#section-5.6-3" class="pilcrow">¶</a></p>
+<p id="section-5.6-4">When the <code>key-attributes</code> claim is used in certificate enrollment workflows, the reported key capabilities <span class="bcp14">MUST</span> be compatible with the KeyUsage extensions requested in the CSR and included in the issued certificate.<a href="#section-5.6-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1483,13 +1594,13 @@ The signature <span class="bcp14">MUST</span> be computed over the verifier-prov
 <p id="section-6.1-2">The mechanism defined in this document assumes:<a href="#section-6.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.1-3.1">
-            <p id="section-6.1-3.1.1">The Attestation Key (AK) is securely provisioned and protected.<a href="#section-6.1-3.1.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-3.1.1">The AK is securely provisioned and protected.<a href="#section-6.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.1-3.2">
-            <p id="section-6.1-3.2.1">The Attestation Key correctly signs attestation evidence reflecting the platform state.<a href="#section-6.1-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-3.2.1">The AK correctly signs attestation evidence reflecting the platform state.<a href="#section-6.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.1-3.3">
-            <p id="section-6.1-3.3.1">The Subject Key private component is accessible only within the protected execution environment at the time the Proof of Possession (PoP) is generated.<a href="#section-6.1-3.3.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-3.3.1">The Subject Key private component is accessible only within the protected execution environment at the time the PoP is generated.<a href="#section-6.1-3.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.1-3.4">
             <p id="section-6.1-3.4.1">The verifier provides an unpredictable nonce to ensure freshness.<a href="#section-6.1-3.4.1" class="pilcrow">¶</a></p>
@@ -1498,76 +1609,87 @@ The signature <span class="bcp14">MUST</span> be computed over the verifier-prov
 <p id="section-6.1-4">If these assumptions do not hold, the security guarantees of this mechanism do not apply.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="key-substitution-attack-illustration">
+<div id="proof-of-possession-rationale">
 <section id="section-6.2">
-        <h3 id="name-key-substitution-attack-ill">
-<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-key-substitution-attack-ill" class="section-name selfRef">Key Substitution Attack Illustration</a>
+        <h3 id="name-proof-of-possession-rationa">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-proof-of-possession-rationa" class="section-name selfRef">Proof-of-Possession Rationale</a>
         </h3>
-<p id="section-6.2-1">The following example illustrates how the mechanism detects a Key Substitution Attack.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-6.2-2">
-<li id="section-6.2-2.1">
-            <p id="section-6.2-2.1.1">An attacker generates a private key outside the trusted execution environment, denoted as K_bad.<a href="#section-6.2-2.1.1" class="pilcrow">¶</a></p>
+<p id="section-6.2-1">The AK signature over the EAT provides indirect evidence about the Subject Key. The attested environment reports that the key exists and that it is protected within the environment, and the AK signature ensures the integrity and authenticity of those claims.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">The PoP defined in this document provides direct evidence of control of the Subject Key. By generating a COSE countersignature using the private component of the Subject Key over the EAT object, the attested environment demonstrates its ability to perform a cryptographic operation with that key.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2-3">By requiring this demonstration, the PoP prevents reliance solely on self-reported claims about the presence of the Subject Key in the attested environment.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="key-substitution-attack-illustration">
+<section id="section-6.3">
+        <h3 id="name-key-substitution-attack-ill">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-key-substitution-attack-ill" class="section-name selfRef">Key Substitution Attack Illustration</a>
+        </h3>
+<p id="section-6.3-1">The following example illustrates how the mechanism detects a Key Substitution Attack.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.3-2">
+<li id="section-6.3-2.1">
+            <p id="section-6.3-2.1.1">An attacker generates a private key outside the trusted execution environment, denoted as K_bad.<a href="#section-6.3-2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-6.2-2.2">
-            <p id="section-6.2-2.2.1">The attacker also possesses or obtains attestation evidence for a different key protected within the trusted execution environment, denoted as K_good.<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
+          <li id="section-6.3-2.2">
+            <p id="section-6.3-2.2.1">The attacker also possesses or obtains attestation evidence for a different key protected within the trusted execution environment, denoted as K_good.<a href="#section-6.3-2.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-6.2-2.3">
-            <p id="section-6.2-2.3.1">The attacker submits a certificate signing request (CSR) signed using K_bad while attaching an EAT containing a claim for K_good.<a href="#section-6.2-2.3.1" class="pilcrow">¶</a></p>
+          <li id="section-6.3-2.3">
+            <p id="section-6.3-2.3.1">The attacker submits a certificate signing request (CSR) signed using K_bad while attaching an EAT containing <code>cnf</code> for K_good.<a href="#section-6.3-2.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-6.2-2.4">
-            <p id="section-6.2-2.4.1">During verification, the Subject Public Key contained in the claim (corresponding to K_good) is compared with the public key contained in the CSR (corresponding to K_bad).<a href="#section-6.2-2.4.1" class="pilcrow">¶</a></p>
+          <li id="section-6.3-2.4">
+            <p id="section-6.3-2.4.1">During verification, the Subject Public Key contained in <code>cnf</code> (corresponding to K_good) is compared with the public key contained in the CSR (corresponding to K_bad).<a href="#section-6.3-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-6.2-3">Because the public keys do not match, the binding verification fails. Although the attestation evidence and the CSR signature may each be valid independently, the mismatch prevents the establishment of a cryptographic binding between the operational certificate key and the attested execution environment.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.3-3">Because the public keys do not match, the binding verification fails. Although the attestation evidence and the CSR signature may each be valid independently, the mismatch prevents the establishment of a cryptographic binding between the certificate private key and the attested execution environment.<a href="#section-6.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="mitigation-of-key-substitution-attacks">
-<section id="section-6.3">
+<section id="section-6.4">
         <h3 id="name-mitigation-of-key-substitut">
-<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-mitigation-of-key-substitut" class="section-name selfRef">Mitigation of Key Substitution Attacks</a>
+<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-mitigation-of-key-substitut" class="section-name selfRef">Mitigation of Key Substitution Attacks</a>
         </h3>
-<p id="section-6.3-1">This mechanism mitigates Key Substitution Attacks by requiring cryptographic proof that the private key used in a CSR or TLS authentication flow corresponds to the key whose protection within the attested execution environment is being asserted.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<p id="section-6.3-2">Because the proof of possession is included within the EAT and validated together with the EAT signature, and because the claimed Subject Public Key must match the operational certificate key, substitution of a private key that is not generated or protected within the attested execution environment is detected.<a href="#section-6.3-2" class="pilcrow">¶</a></p>
-<p id="section-6.3-3">If any of these validations fail, the binding is not established.<a href="#section-6.3-3" class="pilcrow">¶</a></p>
+<p id="section-6.4-1">This mechanism mitigates Key Substitution Attacks by requiring cryptographic proof that the private key used in a CSR or TLS authentication flow corresponds to the key whose protection within the attested execution environment is being asserted.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-2">Because proof of possession is conveyed by a countersignature and validated together with the EAT signature, and because the claimed Subject Public Key in <code>cnf</code> must match the public key contained in the CSR or in the TLS end-entity certificate, substitution of a private key that is not generated or protected within the attested execution environment is detected.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
+<p id="section-6.4-3">If any of these validations fail, the binding is not established.<a href="#section-6.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="freshness-and-replay">
-<section id="section-6.4">
-        <h3 id="name-freshness-and-replay">
-<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-freshness-and-replay" class="section-name selfRef">Freshness and Replay</a>
+<div id="cmw-linkage-security">
+<section id="section-6.5">
+        <h3 id="name-cmw-linkage-security">
+<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-cmw-linkage-security" class="section-name selfRef">CMW Linkage Security</a>
         </h3>
-<p id="section-6.4-1">The PoP signature <span class="bcp14">MUST</span> be computed over a verifier-provided nonce. If the nonce is predictable, reused, or omitted, an attacker could replay a previously valid attestation token and PoP signature.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
-<p id="section-6.4-2">Verifiers <span class="bcp14">MUST</span> ensure that nonces are unpredictable and unique within an appropriate replay window.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
+<p id="section-6.5-1">If the optional <code>cmw</code> claim is used to carry a PAT, Verifiers <span class="bcp14">MUST</span> ensure that the PAT cannot be mixed with an unrelated key attestation token. Verifiers <span class="bcp14">MUST</span> validate nonce linkage using the mandatory nonce claims.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
+<p id="section-6.5-2">Inclusion of PAT in a CMW Collection does not, by itself, establish trust in PAT contents. Verifiers <span class="bcp14">MUST</span> perform full PAT signature and appraisal verification according to the PAT format and trust model.<a href="#section-6.5-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="claim-omission-and-downgrade">
-<section id="section-6.5">
+<section id="section-6.6">
         <h3 id="name-claim-omission-and-downgrad">
-<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-claim-omission-and-downgrad" class="section-name selfRef">Claim Omission and Downgrade</a>
+<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-claim-omission-and-downgrad" class="section-name selfRef">Claim Omission and Downgrade</a>
         </h3>
-<p id="section-6.5-1">If a security policy requires that the private key corresponding to a certificate be protected within an attested execution environment, the entity responsible for enforcing that policy <span class="bcp14">MUST</span> require the presence of this claim.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
-<p id="section-6.5-2">An attacker could attempt a downgrade by omitting the claim while still presenting otherwise valid attestation evidence. If the presence of the claim is not enforced when required by policy, the key substitution vulnerability described in this document remains.<a href="#section-6.5-2" class="pilcrow">¶</a></p>
+<p id="section-6.6-1">If a security policy requires that the private key corresponding to a certificate be generated or protected within an attested execution environment, the Relying Party <span class="bcp14">MUST</span> ensure that the <code>key-attributes</code> claim defined in this document is present, that the EAT <code>nonce</code> claim is present, that the <code>cnf</code> claim is present with <code>COSE_Key</code>, that a valid countersignature is present, and that binding verification succeeds.<a href="#section-6.6-1" class="pilcrow">¶</a></p>
+<p id="section-6.6-2">If a security policy additionally requires platform attestation linkage via <code>cmw</code>, the Relying Party <span class="bcp14">MUST</span> ensure that a valid PAT is present in <code>cmw</code> and that the linkage checks defined in this profile succeed.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
+<p id="section-6.6-3">In deployments using a separate Verifier, the Relying Party <span class="bcp14">MUST</span> require the Verifier to enforce the presence and successful validation of the <code>key-attributes</code> claim, EAT <code>nonce</code>, <code>cnf</code> with <code>COSE_Key</code>, and the countersignature as part of attestation appraisal.<a href="#section-6.6-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="scope-of-guarantees">
-<section id="section-6.6">
+<section id="section-6.7">
         <h3 id="name-scope-of-guarantees">
-<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-scope-of-guarantees" class="section-name selfRef">Scope of Guarantees</a>
+<a href="#section-6.7" class="section-number selfRef">6.7. </a><a href="#name-scope-of-guarantees" class="section-name selfRef">Scope of Guarantees</a>
         </h3>
-<p id="section-6.6-1">This mechanism provides cryptographic evidence that the private component of the Subject Key is under control of the attested execution environment at the time the attestation evidence was generated.<a href="#section-6.6-1" class="pilcrow">¶</a></p>
-<p id="section-6.6-2">It does not guarantee:<a href="#section-6.6-2" class="pilcrow">¶</a></p>
+<p id="section-6.7-1">This mechanism provides cryptographic evidence that the entity producing the attestation evidence demonstrated control of the private component of the Subject Key at the time the evidence was generated.<a href="#section-6.7-1" class="pilcrow">¶</a></p>
+<p id="section-6.7-2">It does not guarantee:<a href="#section-6.7-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.6-3.1">
-            <p id="section-6.6-3.1.1">That the key remains protected after attestation;<a href="#section-6.6-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.7-3.1">
+            <p id="section-6.7-3.1.1">That the key remains protected after attestation;<a href="#section-6.7-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.6-3.2">
-            <p id="section-6.6-3.2.1">That the key cannot later be exported or migrated;<a href="#section-6.6-3.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.7-3.2">
+            <p id="section-6.7-3.2.1">That the key cannot later be exported or migrated;<a href="#section-6.7-3.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.6-3.3">
-            <p id="section-6.6-3.3.1">That the platform remains in the same state after evidence generation.<a href="#section-6.6-3.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.7-3.3">
+            <p id="section-6.7-3.3.1">That the platform remains in the same state after evidence generation.<a href="#section-6.7-3.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-6.6-4">Such guarantees depend on platform-specific properties and lifecycle management outside the scope of this document.<a href="#section-6.6-4" class="pilcrow">¶</a></p>
+<p id="section-6.7-4">Such guarantees depend on platform-specific properties and lifecycle management outside the scope of this document.<a href="#section-6.7-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1577,7 +1699,14 @@ The signature <span class="bcp14">MUST</span> be computed over the verifier-prov
       <h2 id="name-iana-considerations">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-7-1">TODO<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">This document requests registration of a new claim in the "CBOR Web Token (CWT) Claims" registry (established by <span>[<a href="#RFC8392" class="cite xref">RFC8392</a>]</span>).<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">The following value is to be added to this registry:<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">Claim Name: key-attributes
+CWT Claim Key: TBD
+Claim Description: Key protection attributes and key-usage constraints associated with the Subject Key identified by the EAT <code>cnf</code> claim.
+Claim Value Type: CBOR map
+Change Controller: IETF
+Reference: RFCXXXX<a href="#section-7-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="acknowledgments">
@@ -1588,55 +1717,71 @@ The signature <span class="bcp14">MUST</span> be computed over the verifier-prov
 <p id="section-8-1">TODO<a href="#section-8-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="sec-combined-references">
-<section id="section-9">
-      <h2 id="name-references">
-<a href="#name-references" class="section-name selfRef">References</a>
-      </h2>
 <div id="sec-normative-references">
-<section id="section-9.1">
-        <h3 id="name-normative-references">
+<section id="section-9">
+      <h2 id="name-normative-references">
 <a href="#name-normative-references" class="section-name selfRef">Normative References</a>
-        </h3>
+      </h2>
 <dl class="references">
+<dt id="I-D.fossati-seat-early-attestation">[I-D.fossati-seat-early-attestation]</dt>
+      <dd>
+<span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Mihalcea, I.</span>, <span class="refAuthor">Deshpande, Y.</span>, <span class="refAuthor">Fossati, T.</span>, and <span class="refAuthor">T. Reddy.K</span>, <span class="refTitle">"Using Attestation in Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-fossati-seat-early-attestation-03</span>, <time datetime="2026-03-01" class="refDate">1 March 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-fossati-seat-early-attestation-03">https://datatracker.ietf.org/doc/html/draft-fossati-seat-early-attestation-03</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="I-D.fossati-tls-exported-attestation">[I-D.fossati-tls-exported-attestation]</dt>
-        <dd>
+      <dd>
 <span class="refAuthor">Fossati, T.</span>, <span class="refAuthor">Sardar, M. U.</span>, <span class="refAuthor">Reddy.K, T.</span>, <span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Tschofenig, H.</span>, and <span class="refAuthor">I. Mihalcea</span>, <span class="refTitle">"Remote Attestation with Exported Authenticators"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-fossati-tls-exported-attestation-02</span>, <time datetime="2025-07-03" class="refDate">3 July 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-fossati-tls-exported-attestation-02">https://datatracker.ietf.org/doc/html/draft-fossati-tls-exported-attestation-02</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-lamps-csr-attestation">[I-D.ietf-lamps-csr-attestation]</dt>
-        <dd>
-<span class="refAuthor">Ounsworth, M.</span>, <span class="refAuthor">Tschofenig, H.</span>, <span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Wiseman, M.</span>, and <span class="refAuthor">N. Smith</span>, <span class="refTitle">"Use of Remote Attestation with Certification Signing Requests"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-lamps-csr-attestation-22</span>, <time datetime="2026-02-11" class="refDate">11 February 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-lamps-csr-attestation-22">https://datatracker.ietf.org/doc/html/draft-ietf-lamps-csr-attestation-22</a>&gt;</span>. </dd>
+      <dd>
+<span class="refAuthor">Ounsworth, M.</span>, <span class="refAuthor">Tschofenig, H.</span>, <span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Wiseman, M.</span>, and <span class="refAuthor">N. Smith</span>, <span class="refTitle">"Use of Remote Attestation with Certification Signing Requests"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-lamps-csr-attestation-23</span>, <time datetime="2026-03-01" class="refDate">1 March 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-lamps-csr-attestation-23">https://datatracker.ietf.org/doc/html/draft-ietf-lamps-csr-attestation-23</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-rats-msg-wrap">[I-D.ietf-rats-msg-wrap]</dt>
+      <dd>
+<span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Smith, N.</span>, <span class="refAuthor">Fossati, T.</span>, <span class="refAuthor">Tschofenig, H.</span>, and <span class="refAuthor">D. Glaze</span>, <span class="refTitle">"RATS Conceptual Messages Wrapper (CMW)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-msg-wrap-23</span>, <time datetime="2025-12-11" class="refDate">11 December 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-msg-wrap-23">https://datatracker.ietf.org/doc/html/draft-ietf-rats-msg-wrap-23</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-rats-pkix-key-attestation">[I-D.ietf-rats-pkix-key-attestation]</dt>
+      <dd>
+<span class="refAuthor">Ounsworth, M.</span>, <span class="refAuthor">Fiset, J.</span>, <span class="refAuthor">Tschofenig, H.</span>, <span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Wiseman, M.</span>, and <span class="refAuthor">N. Smith</span>, <span class="refTitle">"Evidence Encoding for Hardware Security Modules"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-pkix-key-attestation-03</span>, <time datetime="2026-03-01" class="refDate">1 March 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-pkix-key-attestation-03">https://datatracker.ietf.org/doc/html/draft-ietf-rats-pkix-key-attestation-03</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
-        <dd>
+      <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5280">[RFC5280]</dt>
+      <dd>
+<span class="refAuthor">Cooper, D.</span>, <span class="refAuthor">Santesson, S.</span>, <span class="refAuthor">Farrell, S.</span>, <span class="refAuthor">Boeyen, S.</span>, <span class="refAuthor">Housley, R.</span>, and <span class="refAuthor">W. Polk</span>, <span class="refTitle">"Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile"</span>, <span class="seriesInfo">RFC 5280</span>, <span class="seriesInfo">DOI 10.17487/RFC5280</span>, <time datetime="2008-05" class="refDate">May 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5280">https://www.rfc-editor.org/rfc/rfc5280</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
       <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-</dl>
-</section>
-</div>
-<div id="sec-informative-references">
-<section id="section-9.2">
-        <h3 id="name-informative-references">
-<a href="#name-informative-references" class="section-name selfRef">Informative References</a>
-        </h3>
-<dl class="references">
+<dt id="RFC8392">[RFC8392]</dt>
+      <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Wahlstroem, E.</span>, <span class="refAuthor">Erdtman, S.</span>, and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"CBOR Web Token (CWT)"</span>, <span class="seriesInfo">RFC 8392</span>, <span class="seriesInfo">DOI 10.17487/RFC8392</span>, <time datetime="2018-05" class="refDate">May 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8392">https://www.rfc-editor.org/rfc/rfc8392</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8747">[RFC8747]</dt>
+      <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Seitz, L.</span>, <span class="refAuthor">Selander, G.</span>, <span class="refAuthor">Erdtman, S.</span>, and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"Proof-of-Possession Key Semantics for CBOR Web Tokens (CWTs)"</span>, <span class="seriesInfo">RFC 8747</span>, <span class="seriesInfo">DOI 10.17487/RFC8747</span>, <time datetime="2020-03" class="refDate">March 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8747">https://www.rfc-editor.org/rfc/rfc8747</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC9334">[RFC9334]</dt>
       <dd>
 <span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Thaler, D.</span>, <span class="refAuthor">Richardson, M.</span>, <span class="refAuthor">Smith, N.</span>, and <span class="refAuthor">W. Pan</span>, <span class="refTitle">"Remote ATtestation procedureS (RATS) Architecture"</span>, <span class="seriesInfo">RFC 9334</span>, <span class="seriesInfo">DOI 10.17487/RFC9334</span>, <time datetime="2023-01" class="refDate">January 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9334">https://www.rfc-editor.org/rfc/rfc9334</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC9338">[RFC9338]</dt>
+      <dd>
+<span class="refAuthor">Schaad, J.</span>, <span class="refTitle">"CBOR Object Signing and Encryption (COSE): Countersignatures"</span>, <span class="seriesInfo">STD 96</span>, <span class="seriesInfo">RFC 9338</span>, <span class="seriesInfo">DOI 10.17487/RFC9338</span>, <time datetime="2022-12" class="refDate">December 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9338">https://www.rfc-editor.org/rfc/rfc9338</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9711">[RFC9711]</dt>
+    <dd>
+<span class="refAuthor">Lundblade, L.</span>, <span class="refAuthor">Mandyam, G.</span>, <span class="refAuthor">O'Donoghue, J.</span>, and <span class="refAuthor">C. Wallace</span>, <span class="refTitle">"The Entity Attestation Token (EAT)"</span>, <span class="seriesInfo">RFC 9711</span>, <span class="seriesInfo">DOI 10.17487/RFC9711</span>, <time datetime="2025-04" class="refDate">April 2025</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9711">https://www.rfc-editor.org/rfc/rfc9711</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 </dl>
-</section>
-</div>
 </section>
 </div>
 <div id="authors-addresses">
 <section id="appendix-A">
-      <h2 id="name-authors-address">
-<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
 <address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Tirumaleswar Reddy</span></div>
@@ -1648,6 +1793,16 @@ The signature <span class="bcp14">MUST</span> be computed over the verifier-prov
 <div class="email">
 <span>Email:</span>
 <a href="mailto:k.tirumaleswar_reddy@nokia.com" class="email">k.tirumaleswar_reddy@nokia.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Hannes Tschofenig</span></div>
+<div dir="auto" class="left"><span class="org">University of the Bundeswehr Munich</span></div>
+<div dir="auto" class="left"><span class="locality">Neubiberg</span></div>
+<div dir="auto" class="left"><span class="country-name">Germany</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:hannes.tschofenig@gmx.net" class="email">hannes.tschofenig@gmx.net</a>
 </div>
 </address>
 </section>
