@@ -57,7 +57,7 @@ informative:
 
 This document defines a CWT-based Entity Attestation Token (EAT) profile and a new EAT claim that cryptographically bind a private key used to sign a certificate signing request (CSR), or the private key corresponding to an end-entity certificate used for TLS authentication, to an attested execution environment.
 
-The subject public key is conveyed using the EAT `cnf` claim defined in {{!RFC8747}}, and freshness uses the EAT `nonce` claim defined in {{!RFC9711}}. The proof of possession of the subject key is obtained from the surrounding protocol, such as TLS certificate-based authentication or CSR signature verification. Because the EAT is signed by a hardware-backed Attestation Key (AK), successful verification of the EAT signature together with protocol-level proof of possession establishes a cryptographic binding between the private key and the attested platform state. Optionally, a Platform Attestation Token (PAT) can be embedded or linked using a Conceptual Message Wrapper (CMW) as defined in {{!I-D.ietf-rats-msg-wrap}}. This mechanism addresses key substitution attacks that arise when attestation evidence and the certificate private keys are validated independently.
+The subject public key is conveyed using the EAT `cnf` claim defined in {{!RFC8747}}, and freshness uses the EAT `nonce` claim defined in {{!RFC9711}}. The proof of possession of the subject key is obtained from the surrounding protocol, such as TLS certificate-based authentication or CSR signature verification. Because the EAT is signed by a hardware-backed Attestation Key (AK), successful verification of the EAT signature together with protocol-level proof of possession establishes a cryptographic binding between the private key and the attested platform state. This mechanism addresses key substitution attacks that arise when attestation evidence and the certificate private keys are validated independently.
 
 
 --- middle
@@ -158,18 +158,6 @@ During verification, three relationships are checked:
 
 When these checks succeed, the verifier gains assurance that the certificate private key used in the protocol is the same key whose protection within the attested execution environment is being asserted.
 
-## Optional Linkage to Platform Attestation Token (PAT) via CMW
-
-This profile optionally allows carrying a Platform Attestation Token (PAT) using the CWT `cmw` claim defined in {{!I-D.ietf-rats-msg-wrap}}.
-
-When the `cmw` claim is present:
-
-- The `cmw` claim value MUST be a CMW Collection encoded as `cbor-collection`, following Section 4.3.1 of {{!I-D.ietf-rats-msg-wrap}}.
-- The Collection MUST contain at least one CMW entry that conveys platform attestation Evidence (PAT).
-- The PAT and the key attestation evidence in this profile MUST be cryptographically bound to the same appraisal context.
-
-This profile uses nonce linkage for that binding: The PAT nonce claim MUST be present, and its value MUST match the top-level EAT `nonce`.
-
 # Proof-of-Possession
 
 The Proof of Possession (PoP) demonstrates control of the private component of the Subject Key.
@@ -217,11 +205,6 @@ Upon receipt of attestation evidence for this profile, the Verifier MUST perform
 
    If the public key parameters do not match, the binding verification MUST fail.
 
-7. If the `cmw` claim is present, validate CMW processing according to {{!I-D.ietf-rats-msg-wrap}}, including:
-   - confirmation that `cmw` is a CMW Collection (`cbor-collection`);
-   - verification of the PAT Evidence conveyed in the Collection according to the PAT format and trust model; and
-   - verification that PAT and key attestation evidence are bound to the same appraisal context by matching nonce values.
-
 Successful completion of all checks establishes a cryptographic binding between the private component corresponding to the public key used in the CSR or TLS end-entity certificate and the attested execution environment at the time the evidence was generated.
 
 The Verifier conveys the result of the binding verification to the Relying Party as part of the attestation result.
@@ -267,10 +250,6 @@ For example:
 * For other key types: The public key parameters defined by the relevant cryptographic specification MUST match exactly. Comparison based solely on serialized encodings (e.g., raw CBOR, JSON, or DER byte sequences) is NOT RECOMMENDED, as differences in encoding rules may cause equivalent keys to appear unequal.
 
 If the comparison fails, the binding verification MUST fail, even if the attestation evidence itself is otherwise valid. The Verifier MUST convey the outcome of the binding verification to the Relying Party as part of its appraisal result.
-
-## Optional cmw Claim Usage
-
-This document does not define a new `cmw` claim. If present, `cmw` MUST follow the syntax and semantics defined in {{!I-D.ietf-rats-msg-wrap}}.
 
 ## Protocol-Based PoP
 
@@ -336,17 +315,9 @@ Because protocol-level proof of possession is validated together with the EAT si
 
 If any of these validations fail, the binding is not established.
 
-## CMW Linkage Security
-
-If the optional `cmw` claim is used to carry a PAT, Verifiers MUST ensure that the PAT cannot be mixed with an unrelated key attestation token. Verifiers MUST validate nonce linkage using the mandatory nonce claims.
-
-Inclusion of PAT in a CMW Collection does not, by itself, establish trust in PAT contents. Verifiers MUST perform full PAT signature and appraisal verification according to the PAT format and trust model.
-
 ## Claim Omission and Downgrade
 
 If a security policy requires that the private key corresponding to a certificate be generated or protected within an attested execution environment, the Relying Party MUST ensure that the `key-attributes` claim defined in this document is present, that the EAT `nonce` claim is present, that the `cnf` claim is present with `COSE_Key`, that protocol-level PoP verification succeeds, and that binding verification succeeds.
-
-If a security policy additionally requires platform attestation linkage via `cmw`, the Relying Party MUST ensure that a valid PAT is present in `cmw` and that the linkage checks defined in this profile succeed.
 
 In deployments using a separate Verifier, the Relying Party MUST require the Verifier to enforce the presence and successful validation of the `key-attributes` claim, EAT `nonce`, `cnf` with `COSE_Key`, and protocol-level PoP verification as part of attestation appraisal.
 
