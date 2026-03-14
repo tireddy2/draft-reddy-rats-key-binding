@@ -171,7 +171,7 @@ The public key used for protocol-level PoP verification MUST correspond to the S
 
 For this profile, the EAT `nonce` claim defined in {{!RFC9711}} is the mandatory freshness mechanism. The EAT `nonce` claim MUST be present and MUST contain a single nonce value supplied by the verifier.
 
-The nonce MUST be supplied by the verifier and MUST be unpredictable and unique within the verifier's replay window. 
+The nonce MUST be supplied by the verifier and MUST be unpredictable and unique within the verifier's replay window.
 
 The validity period of the key attestation evidence is determined by the lifetime of the enclosing EAT. Verifiers MUST enforce the `iat`, `nbf`, and `exp` claims defined in {{!RFC9711}} to ensure that attestation evidence is not used outside its intended validity window.
 
