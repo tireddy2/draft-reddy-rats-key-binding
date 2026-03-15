@@ -5,8 +5,8 @@
 RATS                                                            T. Reddy
 Internet-Draft                                                     Nokia
 Intended status: Standards Track                           H. Tschofenig
-Expires: 12 September 2026                                      UniBw M.
-                                                           11 March 2026
+Expires: 16 September 2026                                      UniBw M.
+                                                           15 March 2026
 
 
           Key Attestation for Entity Attestation Tokens (EAT)
@@ -59,7 +59,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 September 2026.
+   This Internet-Draft will expire on 16 September 2026.
 
 Copyright Notice
 
@@ -94,10 +94,11 @@ Table of Contents
    6.  Security Considerations
      6.1.  Threat Model
      6.2.  Proof-of-Possession Rationale
-     6.3.  Key Substitution Attack Illustration
-     6.4.  Mitigation of Key Substitution Attacks
-     6.5.  Claim Omission and Downgrade
-     6.6.  Scope of Guarantees
+     6.3.  Key Protection Properties
+     6.4.  Key Substitution Attack Illustration
+     6.5.  Mitigation of Key Substitution Attacks
+     6.6.  Claim Omission and Downgrade
+     6.7.  Scope of Guarantees
    7.  IANA Considerations
    Acknowledgments
    Normative References
@@ -369,14 +370,18 @@ Table of Contents
 4.1.  Freshness Requirements
 
    The verifier MUST provide a nonce with sufficient entropy to prevent
-   replay.  The nonce MUST be unpredictable and unique within the
-   verifier's replay window.  The verifier MUST validate that the nonce
-   claim in the EAT matches the nonce it supplied.  Failure to include
-   verifier-provided freshness renders the mechanism vulnerable to
-   replay of previously valid attestation evidence.
+   replay.  The nonce is conveyed to the Attester by the Relying Party
+   through the surrounding protocol.  The nonce MUST be unpredictable
+   and unique within the verifier's replay window.  The verifier MUST
+   validate that the nonce claim in the EAT matches the nonce it
+   supplied.  Failure to include verifier-provided freshness renders the
+   mechanism vulnerable to replay of previously valid attestation
+   evidence.  Mechanisms for obtaining and conveying such nonces in
+   certificate enrollment protocols are described in
+   [I-D.ietf-lamps-attestation-freshness].
 
    The verifier-provided nonce is the primary mechanism for ensuring
-   freshness of the proof of possession.  The EAT time-based claims
+   freshness of the attestation evidence.  The EAT time-based claims
    (iat, nbf, and exp) provide an additional validity window for the
    attestation evidence but do not replace the requirement for a
    verifier-provided nonce.  Verifiers MUST validate both the nonce and
@@ -403,28 +408,21 @@ Table of Contents
        cnf to contain COSE_Key.  Use of Encrypted_COSE_Key or a kid-only
        representation is outside the scope of this profile.
 
-   5.  Verify proof of possession of the Subject Key using the
-       surrounding protocol:
+   5.  Compare the Subject Public Key contained in cnf with the public
+       key used for protocol-level PoP verification.  This public key is
+       either obtained directly from the protocol or supplied to the
+       Verifier by the Relying Party.
 
-       *  in certificate enrollment workflows, validate the CSR
-          signature; or
+       *  In certificate enrollment, the public key is obtained from the
+          CSR.
 
-       *  in TLS workflows, validate certificate-based TLS
-          authentication.
+       *  In TLS, the public key is obtained from the end-entity
+          certificate used for TLS authentication.
 
-       If protocol-level PoP verification fails, the binding
-       verification MUST fail.
-
-   6.  Compare the Subject Public Key contained in cnf with the public
-       key used for protocol-level PoP verification.
-
-       *  contained in the CSR, in certificate enrollment workflow; or
-
-       *  contained in the end-entity certificate used for TLS
-          authentication.
-
-       If the public key parameters do not match, the binding
-       verification MUST fail.
+   The public key provided to the Verifier MUST correspond to the same
+   key for which protocol-level PoP verification was performed.  If the
+   public key parameters do not match, the binding verification MUST
+   fail.
 
    Successful completion of all checks establishes a cryptographic
    binding between the private component corresponding to the public key
@@ -501,10 +499,8 @@ Table of Contents
       JSON, or DER byte sequences) is NOT RECOMMENDED, as differences in
       encoding rules may cause equivalent keys to appear unequal.
 
-   If the comparison fails, the binding verification MUST fail, even if
-   the attestation evidence itself is otherwise valid.  The Verifier
-   MUST convey the outcome of the binding verification to the Relying
-   Party as part of its appraisal result.
+   If the comparison fails, the key-to-platform binding is not
+   established.
 
 5.3.  Protocol-Based PoP
 
@@ -581,7 +577,21 @@ Table of Contents
    self-reported claims about the presence of the Subject Key in the
    attested environment.
 
-6.3.  Key Substitution Attack Illustration
+6.3.  Key Protection Properties
+
+   The cnf claim establishes a cryptographic binding between the Subject
+   Key and the attestation evidence.  However, the cnf claim alone does
+   not convey information about the protection properties of the private
+   component of that key.
+
+   Some deployments require assurances regarding how the private key is
+   generated, stored, and protected (for example, whether the key is
+   non-exportable or generated within a hardware-protected environment).
+   The key-attributes claim enables the Verifier to evaluate such
+   properties and determine whether the Subject Key satisfies the
+   security requirements of the deployment.
+
+6.4.  Key Substitution Attack Illustration
 
    The following example illustrates how the mechanism detects a Key
    Substitution Attack.
@@ -606,7 +616,7 @@ Table of Contents
    cryptographic binding between the certificate private key and the
    attested execution environment.
 
-6.4.  Mitigation of Key Substitution Attacks
+6.5.  Mitigation of Key Substitution Attacks
 
    This mechanism mitigates Key Substitution Attacks by requiring
    cryptographic proof that the private key used in a CSR or TLS
@@ -621,7 +631,7 @@ Table of Contents
 
    If any of these validations fail, the binding is not established.
 
-6.5.  Claim Omission and Downgrade
+6.6.  Claim Omission and Downgrade
 
    If a security policy requires that the private key corresponding to a
    certificate be generated or protected within an attested execution
@@ -636,7 +646,7 @@ Table of Contents
    validation of the key-attributes claim, EAT nonce, cnf with COSE_Key,
    and protocol-level PoP verification as part of attestation appraisal.
 
-6.6.  Scope of Guarantees
+6.7.  Scope of Guarantees
 
    This mechanism provides cryptographic evidence that the entity
    participating in the surrounding protocol demonstrated control of the
@@ -688,6 +698,17 @@ Normative References
               Draft, draft-fossati-tls-exported-attestation-02, 3 July
               2025, <https://datatracker.ietf.org/doc/html/draft-
               fossati-tls-exported-attestation-02>.
+
+   [I-D.ietf-lamps-attestation-freshness]
+              Tschofenig, H., Brockhaus, H., Mandel, J., and S. Turner,
+              "Nonce-based Freshness for Remote Attestation in
+              Certificate Signing Requests (CSRs) for the Certification
+              Management Protocol (CMP), for Enrollment over Secure
+              Transport (EST), and for Certificate Management over CMS
+              (CMC)", Work in Progress, Internet-Draft, draft-ietf-
+              lamps-attestation-freshness-05, 19 October 2025,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-lamps-
+              attestation-freshness-05>.
 
    [I-D.ietf-lamps-csr-attestation]
               Ounsworth, M., Tschofenig, H., Birkholz, H., Wiseman, M.,
