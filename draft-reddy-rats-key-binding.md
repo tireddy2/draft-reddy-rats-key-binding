@@ -177,9 +177,10 @@ The validity period of the key attestation evidence is determined by the lifetim
 
 ## Freshness Requirements
 
-The verifier MUST provide a nonce with sufficient entropy to prevent replay. The nonce MUST be unpredictable and unique within the verifier's replay window. The verifier MUST validate that the nonce claim in the EAT matches the nonce it supplied. Failure to include verifier-provided freshness renders the mechanism vulnerable to replay of previously valid attestation evidence.
+The verifier MUST provide a nonce with sufficient entropy to prevent replay. The nonce is conveyed to the Attester by the Relying Party through the surrounding protocol.
+The nonce MUST be unpredictable and unique within the verifier's replay window. The verifier MUST validate that the nonce claim in the EAT matches the nonce it supplied. Failure to include verifier-provided freshness renders the mechanism vulnerable to replay of previously valid attestation evidence. Mechanisms for obtaining and conveying such nonces in certificate enrollment protocols are described in {{!I-D.ietf-lamps-attestation-freshness}}.
 
-The verifier-provided nonce is the primary mechanism for ensuring freshness of the proof of possession. The EAT time-based claims (`iat`, `nbf`, and `exp`) provide an additional validity window for the attestation evidence but do not replace the requirement for a verifier-provided nonce. Verifiers MUST validate both the nonce and the applicable time-based claims when evaluating this profile.
+The verifier-provided nonce is the primary mechanism for ensuring freshness of the attestation evidence. The EAT time-based claims (`iat`, `nbf`, and `exp`) provide an additional validity window for the attestation evidence but do not replace the requirement for a verifier-provided nonce. Verifiers MUST validate both the nonce and the applicable time-based claims when evaluating this profile.
 
 ## Verification Procedure
 
@@ -193,17 +194,11 @@ Upon receipt of attestation evidence for this profile, the Verifier MUST perform
 
 4. Extract the Subject Public Key from the EAT `cnf` claim. This profile requires the `cnf` claim defined in {{!RFC8747}} and requires `cnf` to contain `COSE_Key`. Use of `Encrypted_COSE_Key` or a `kid`-only representation is outside the scope of this profile.
 
-5. Verify proof of possession of the Subject Key using the surrounding protocol:
-   - in certificate enrollment workflows, validate the CSR signature; or
-   - in TLS workflows, validate certificate-based TLS authentication.
+5. Compare the Subject Public Key contained in `cnf` with the public key used for protocol-level PoP verification. This public key is either obtained directly from the  protocol or supplied to the Verifier by the Relying Party.
+   - In certificate enrollment, the public key is obtained from the CSR.
+   - In TLS, the public key is obtained from the end-entity certificate used for TLS authentication.
 
-   If protocol-level PoP verification fails, the binding verification MUST fail.
-
-6. Compare the Subject Public Key contained in `cnf` with the public key used for protocol-level PoP verification.
-   - contained in the CSR, in certificate enrollment workflow; or
-   - contained in the end-entity certificate used for TLS authentication.
-
-   If the public key parameters do not match, the binding verification MUST fail.
+The public key provided to the Verifier MUST correspond to the same key for which protocol-level PoP verification was performed. If the public key parameters do not match, the binding verification MUST fail.
 
 Successful completion of all checks establishes a cryptographic binding between the private component corresponding to the public key used in the CSR or TLS end-entity certificate and the attested execution environment at the time the evidence was generated.
 
@@ -249,7 +244,7 @@ For example:
 * For ML-DSA, SLH-DSA, and FN-DSA keys: The comparison MUST be performed over the raw public key byte string defined by the relevant algorithm specification (e.g., FIPS-204 for ML-DSA). In `cnf`, the Verifier MUST extract the raw public key bytes from the `pub` parameter of that structure. In an X.509 certificate {{!RFC5280}}, the public key is carried in the SubjectPublicKeyInfo structure. The Verifier MUST extract the contents of the `subjectPublicKey` BIT STRING and obtain the contained public key byte string. The raw public key byte string extracted from `cnf` and the byte string extracted from the certificate MUST match exactly.
 * For other key types: The public key parameters defined by the relevant cryptographic specification MUST match exactly. Comparison based solely on serialized encodings (e.g., raw CBOR, JSON, or DER byte sequences) is NOT RECOMMENDED, as differences in encoding rules may cause equivalent keys to appear unequal.
 
-If the comparison fails, the binding verification MUST fail, even if the attestation evidence itself is otherwise valid. The Verifier MUST convey the outcome of the binding verification to the Relying Party as part of its appraisal result.
+If the comparison fails, the key-to-platform binding is not established.
 
 ## Protocol-Based PoP
 
@@ -295,6 +290,12 @@ If these assumptions do not hold, the security guarantees of this mechanism do n
 The AK signature over the EAT provides evidence about the Subject Key and its asserted protection properties. Protocol-level PoP verification provides direct evidence of control of the Subject Key.
 
 By requiring both checks, the profile prevents reliance solely on self-reported claims about the presence of the Subject Key in the attested environment.
+
+## Key Protection Properties
+
+The `cnf` claim establishes a cryptographic binding between the Subject Key and the attestation evidence. However, the `cnf` claim alone does not convey information about the protection properties of the private component of that key.
+
+Some deployments require assurances regarding how the private key is generated, stored, and protected (for example, whether the key is non-exportable or generated within a hardware-protected environment). The `key-attributes` claim enables the Verifier to evaluate such properties and determine whether the Subject Key satisfies the security requirements of the deployment.
 
 ## Key Substitution Attack Illustration
 
