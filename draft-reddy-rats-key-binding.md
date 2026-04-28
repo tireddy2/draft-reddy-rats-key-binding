@@ -355,7 +355,7 @@ The following value is to be added to this registry:
 
 *  Claim Name: key-attributes
 *  CWT Claim Key: TBD
-*  Claim Description: Key protection attributes and key-usage constraints associated   
+*  Claim Description: Key protection attributes and key-usage constraints associated
    with the Subject Key identified by the EAT `cnf` claim.
 *  Claim Value Type: CBOR map
 *  Change Controller: IETF
