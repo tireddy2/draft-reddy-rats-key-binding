@@ -120,7 +120,7 @@ Key Substitution Attack: An attack in which valid attestation evidence from a pr
 
 ## Overview
 
-A foundational requirement of this profile is that the Subject Key MUST be generated and held within the attested execution environment. This is what gives the `key-attributes` claims their authority, the attested environment signs attestation evidence about key material it generated and controls. 
+A foundational requirement of this profile is that the Subject Key MUST be generated and held within the attested execution environment. This is what gives the `key-attributes` claims their authority, the attested environment signs attestation evidence about key material it generated and controls.
 
 This document defines a CWT-based EAT profile and a new EAT claim that establish a cryptographic binding between a Subject Key and an attested execution environment.
 The profile is defined for EAT conveyed as a CWT Claims Set in a `COSE_Sign1` message.
