@@ -64,7 +64,7 @@ The subject public key is conveyed using the EAT `cnf` claim defined in {{!RFC87
 
 # Introduction
 
-Remote attestation enables an entity to produce attestation evidence that a verifier can use to assess whether the entity’s platform state satisfies a required policy. In certificate enrollment and authentication protocols (e.g., TLS), a common security policy requirement is that a private key used by an endpoint must be generated, stored, and protected within a trusted execution environment (TEE) or comparable hardware root of trust.
+Remote attestation enables an entity to produce attestation evidence that a verifier can use to assess whether the entity's platform state satisfies a required policy. In certificate enrollment and authentication protocols (e.g., TLS), a common security policy requirement is that a private key used by an endpoint must be generated, stored, and protected within a trusted execution environment (TEE) or comparable hardware root of trust.
 
 In certificate enrollment workflows, a Certification Authority (CA) may require attestation evidence demonstrating that the private key corresponding to the public key in a certificate signing request (CSR) is protected by a hardware-backed environment. The LAMPS CSR Attestation specification {{!I-D.ietf-lamps-csr-attestation}} defines mechanisms for including attestation evidence alongside a CSR. In this model, the CA verifies the CSR signature using the public key contained in the request and independently verifies the attestation evidence according to the RATS architecture, using applicable endorsements and trust anchors.
 However, attestation evidence does not inherently provide a cryptographic proof that the private key used to sign the CSR is the same key that is generated, stored, or protected within the attested environment. The CSR signature demonstrates possession of a private key, and the attestation demonstrates properties of a platform state, but there is no standardized mechanism that cryptographically binds these two validations together. An endpoint could present valid attestation evidence from a protected environment while submitting a certificate signing request (CSR) that is signed with a private key not generated or stored within that environment. In this case, the Certification Authority has no intrinsic cryptographic assurance that the private key corresponding to the CSR public key benefits from the protections described in the attestation evidence.
@@ -84,6 +84,10 @@ A relying party will also require additional claims describing key protection pr
 
 Appendix A.1.4 of {{!RFC9711}} illustrates how a key and key store may be represented in evidence. However, the example uses private-use claim labels and does not define standardized key-protection claims. This specification uses the standardized `cnf` claim from {{!RFC8747}} and defines a new claim for key-protection attributes and usage constraints, while relying on protocol-level proof of possession.
 
+Prior work on EAT-based key attestation is described in {{?I-D.bft-rats-kat}}, which defines mechanisms for associating cryptographic keys with attestation evidence and demonstrating possession of the corresponding private key. This document takes a simpler approach, it uses the existing Attestation Key (AK) to sign a single EAT that directly includes the subject public key via the `cnf` claim and its protection properties via the `key-attributes` claim.
+
+The use of directly conveyed key protection properties in attestation evidence is consistent with {{!I-D.ietf-rats-pkix-key-attestation}}, which defines attributes describing protection properties of managed keys, such as extractable, never-extractable, sensitive, and local.
+
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
@@ -98,7 +102,7 @@ Attestation Key (AK): A cryptographic key, typically hardware-backed, used to si
 
 Attestation Evidence: Claims about a platform's state, signed by an Attestation Key, and conveyed in an Entity Attestation Token (EAT).
 
-Entity Attestation Token (EAT): A token format that conveys attestation claims, as defined in {{?RFC9711}}
+Entity Attestation Token (EAT): A token format that conveys attestation claims, as defined in {{?RFC9711}}.
 
 Subject Key: An asymmetric key pair for which the protection of the private component within an attested execution environment is being asserted. The corresponding public component is conveyed in the EAT `cnf` claim and compared with the key used in a CSR or TLS end-entity certificate.
 
@@ -115,6 +119,8 @@ Key Substitution Attack: An attack in which valid attestation evidence from a pr
 # Key Confirmation and Binding Profile
 
 ## Overview
+
+A foundational requirement of this profile is that the Subject Key MUST be generated and held within the attested execution environment. This is what gives the `key-attributes` claims their authority, the attested environment signs attestation evidence about key material it generated and controls. 
 
 This document defines a CWT-based EAT profile and a new EAT claim that establish a cryptographic binding between a Subject Key and an attested execution environment.
 The profile is defined for EAT conveyed as a CWT Claims Set in a `COSE_Sign1` message.
@@ -186,9 +192,9 @@ The verifier-provided nonce is the primary mechanism for ensuring freshness of t
 
 Upon receipt of attestation evidence for this profile, the Verifier MUST perform the following checks:
 
-1. Validate the signature on the EAT using the applicable trust anchors and endorsements for the Attestation Key. If this validation fails, the attestation evidence MUST be rejected.
+1. Validate the signature on the EAT using the applicable trust anchors for the Attestation Key. If this validation fails, the attestation evidence MUST be rejected.
 
-2. Validate the `key-attributes` claim. The `key-attributes` claim MUST be present and MUST contain at least one member.
+2. Validate the `key-attributes` claim. The `key-attributes` claim MUST be present and MUST contain at least one member. Trust in the key-attributes claim depends on successful appraisal of the attestation evidence for the target environment in which the Subject Key is generated and protected. Such appraisal includes evaluation of measurements in the attestation evidence against the applicable reference values as described in the RATS Architecture {{!RFC9334}} and EAT {{!RFC9711}}.
 
 3. Validate the EAT `nonce` claim. The EAT `nonce` claim MUST be present, MUST contain a single nonce value, and MUST match the verifier-supplied nonce.
 
@@ -291,6 +297,14 @@ The AK signature over the EAT provides evidence about the Subject Key and its as
 
 By requiring both checks, the profile prevents reliance solely on self-reported claims about the presence of the Subject Key in the attested environment.
 
+## Binding of Key Protection Claims to the Attested Environment
+
+The `key-attributes` claim conveys protection properties of the Subject Key, such as non-exportability and hardware-level protection. For these claims to be trustworthy, they must be asserted by the attested environment that generated and holds the Subject Key, as it is the only entity with direct knowledge of and authority over the key protection properties.
+
+An alternative construction sometimes used in attestation protocols is to build an unsigned claims set (UCCS) containing the Subject Public Key and associated attributes, hash it, and supply the hash as a challenge to an existing attestation interface. In such constructions, the attestation evidence provides an indirect cryptographic binding between the claims set and the attested environment. However, a TEE-bound process acting as a proxy could forward a fabricated UCCS on behalf of an untrusted caller, causing the attested environment to sign claims it did not generate and cannot verify.
+
+This profile instead requires the Attestation Key (AK) to directly sign the EAT Claims Set containing the key-attributes claim and the Subject Public Key in cnf. This ensures that key protection attributes are conveyed as claims directly attested by the Attestor, eliminating the risk of fabricated claims being indirectly bound to attestation evidence.
+
 ## Key Protection Properties
 
 The `cnf` claim establishes a cryptographic binding between the Subject Key and the attestation evidence. However, the `cnf` claim alone does not convey information about the protection properties of the private component of that key.
@@ -352,4 +366,7 @@ The following value is to be added to this registry:
 # Acknowledgments
 {: numbered="false"}
 
-The authors thank Paul Walters for raising the relay attack threat considered in this document.
+The authors thank Paul Walters, Nathanael Ritz and Thomas Fossati for the discussion and comments.
+
+--- back
+
