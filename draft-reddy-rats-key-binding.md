@@ -84,9 +84,9 @@ A relying party will also require additional claims describing key protection pr
 
 Appendix A.1.4 of {{!RFC9711}} illustrates how a key and key store may be represented in evidence. However, the example uses private-use claim labels and does not define standardized key-protection claims. This specification uses the standardized `cnf` claim from {{!RFC8747}} and defines a new claim for key-protection attributes and usage constraints, while relying on protocol-level proof of possession.
 
-Prior work on EAT-based key attestation is described in {{?I-D.bft-rats-kat}}, which targets ARM Confidential Computing Architecture (CCA) platforms. That approach uses a
-dedicated Key Attestation Key (KAK) to sign a Key Attestation Token (KAT) containing the subject public key, and a separate Platform Attestation Token (PAT) containing platform state, both bundled together as a CMW collection {{?I-D.ietf-rats-msg-wrap}}.
-This document takes a simpler approach, it uses the existing Attestation Key (AK) to sign a single EAT that directly includes the subject public key via the `cnf` claim and its protection properties via the `key-attributes` claim, without requiring separate tokens or additional dedicated attestation components.
+Prior work on EAT-based key attestation is described in {{?I-D.bft-rats-kat}}, which defines mechanisms for associating cryptographic keys with attestation evidence and demonstrating possession of the corresponding private key. This document takes a simpler approach, it uses the existing Attestation Key (AK) to sign a single EAT that directly includes the subject public key via the `cnf` claim and its protection properties via the `key-attributes` claim.
+
+The use of directly conveyed key protection properties in attestation evidence is consistent with {{!I-D.ietf-rats-pkix-key-attestation}}, which defines attributes describing protection properties of managed keys, such as extractable, never-extractable, sensitive, and local.
 
 # Conventions and Definitions
 
@@ -120,7 +120,7 @@ Key Substitution Attack: An attack in which valid attestation evidence from a pr
 
 ## Overview
 
-A foundational requirement of this profile is that the Subject Key MUST be generated and held within the attested execution environment. This is what gives the `key-attributes` claims their authority, the attested environment signs attestation evidence about key material it generated and controls.
+A foundational requirement of this profile is that the Subject Key MUST be generated and held within the attested execution environment. This is what gives the `key-attributes` claims their authority, the attested environment signs attestation evidence about key material it generated and controls. 
 
 This document defines a CWT-based EAT profile and a new EAT claim that establish a cryptographic binding between a Subject Key and an attested execution environment.
 The profile is defined for EAT conveyed as a CWT Claims Set in a `COSE_Sign1` message.
@@ -192,9 +192,9 @@ The verifier-provided nonce is the primary mechanism for ensuring freshness of t
 
 Upon receipt of attestation evidence for this profile, the Verifier MUST perform the following checks:
 
-1. Validate the signature on the EAT using the applicable trust anchors for the Attestation Key and endorsements. If this validation fails, the attestation evidence MUST be rejected.
+1. Validate the signature on the EAT using the applicable trust anchors for the Attestation Key. If this validation fails, the attestation evidence MUST be rejected.
 
-2. Validate the `key-attributes` claim. The `key-attributes` claim MUST be present and MUST contain at least one member.
+2. Validate the `key-attributes` claim. The `key-attributes` claim MUST be present and MUST contain at least one member. Trust in the key-attributes claim depends on successful appraisal of the attestation evidence for the target environment in which the Subject Key is generated and protected. Such appraisal includes evaluation of measurements in the attestation evidence against the applicable reference values as described in the RATS Architecture {{!RFC9334}} and EAT {{!RFC9711}}.
 
 3. Validate the EAT `nonce` claim. The EAT `nonce` claim MUST be present, MUST contain a single nonce value, and MUST match the verifier-supplied nonce.
 
@@ -301,7 +301,9 @@ By requiring both checks, the profile prevents reliance solely on self-reported 
 
 The `key-attributes` claim conveys protection properties of the Subject Key, such as non-exportability and hardware-level protection. For these claims to be trustworthy, they must be asserted by the attested environment that generated and holds the Subject Key, as it is the only entity with direct knowledge of and authority over the key protection properties.
 
-An alternative construction sometimes used in attestation protocols is to build an unsigned claims set (UCCS) containing the subject public key and its attributes, hash it, and supply the hash as a nonce to the existing platform attestation interface. While this construction is useful for binding a public key to platform evidence, it is insufficient for conveying `key-attributes` claims. A UCCS-based construction is insufficient for conveying key-attributes claims, as the UCCS can be fabricated by any process outside the trusted boundary. A malicious application could assert false key protection properties, and the platform would sign the hash without verifying them. Therefore, this profile requires the AK to sign the full EAT Claims Set, ensuring key-attributes are asserted by the attested environment itself.
+An alternative construction sometimes used in attestation protocols is to build an unsigned claims set (UCCS) containing the Subject Public Key and associated attributes, hash it, and supply the hash as a challenge to an existing attestation interface. In such constructions, the attestation evidence provides an indirect cryptographic binding between the claims set and the attested environment. However, a TEE-bound process acting as a proxy could forward a fabricated UCCS on behalf of an untrusted caller, causing the attested environment to sign claims it did not generate and cannot verify.
+
+This profile instead requires the Attestation Key (AK) to directly sign the EAT Claims Set containing the key-attributes claim and the Subject Public Key in cnf. This ensures that key protection attributes are conveyed as claims directly attested by the Attestor, eliminating the risk of fabricated claims being indirectly bound to attestation evidence.
 
 ## Key Protection Properties
 
@@ -355,7 +357,7 @@ The following value is to be added to this registry:
 
 *  Claim Name: key-attributes
 *  CWT Claim Key: TBD
-*  Claim Description: Key protection attributes and key-usage constraints associated
+*  Claim Description: Key protection attributes and key-usage constraints associated   
    with the Subject Key identified by the EAT `cnf` claim.
 *  Claim Value Type: CBOR map
 *  Change Controller: IETF
