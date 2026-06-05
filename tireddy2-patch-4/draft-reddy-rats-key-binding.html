@@ -1316,6 +1316,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-2-15">Platform Attestation Token (PAT): An EAT signed by the platform Attestation Key that conveys the state of the trusted computing base. In this context, 'platform' refers to the Attester's full TCB. The KAK public key is conveyed via the <code>cnf</code> claim, and KAK protection properties via the <code>key-attributes</code> claim.<a href="#section-2-15" class="pilcrow">¶</a></p>
 <p id="section-2-16">Key Attestation Token (KAT): An EAT signed by the KAK that conveys the Subject Public Key via the <code>cnf</code> claim and Subject Key protection properties via the <code>key-attributes</code> claim.<a href="#section-2-16" class="pilcrow">¶</a></p>
 <p id="section-2-17">Combined Attestation Bundle (CAB): A structure that bundles a Key Attestation Token (KAT) and a Platform Attestation Token (PAT) together for transport in the surrounding protocol, using the CMW collection format <span>[<a href="#I-D.ietf-rats-msg-wrap" class="cite xref">I-D.ietf-rats-msg-wrap</a>]</span>.<a href="#section-2-17" class="pilcrow">¶</a></p>
+<p id="section-2-18">The public key carried in the <code>cnf</code> claim is referred to as the Subject Public Key in this document, reflecting its use as the public key carried in the SubjectPublicKeyInfo field of an X.509 certificate <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> in certificate enrollment and TLS authentication. In the context of the <code>cnf</code> claim defined in <span>[<a href="#RFC8747" class="cite xref">RFC8747</a>]</span> and <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span>, this key serves as the proof-of-possession key.<a href="#section-2-18" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="architecture">
@@ -1454,7 +1455,7 @@ The nonce <span class="bcp14">MUST</span> be unpredictable and unique within the
             <p id="section-5.2-2.3.1">Validate the EAT <code>eat_nonce</code> claim. The EAT <code>eat_nonce</code> claim <span class="bcp14">MUST</span> be present, <span class="bcp14">MUST</span> contain a single nonce value, and <span class="bcp14">MUST</span> match the verifier-supplied nonce.<a href="#section-5.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-5.2-2.4">
-            <p id="section-5.2-2.4.1">Extract the Subject Public Key from the EAT <code>cnf</code> claim. The <code>cnf</code> claim <span class="bcp14">MUST</span> contain the subject public key.<a href="#section-5.2-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-5.2-2.4.1">Extract the Subject Public Key from the EAT <code>cnf</code> claim.<a href="#section-5.2-2.4.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-5.2-2.5">
             <p id="section-5.2-2.5.1">Compare the Subject Public Key contained in <code>cnf</code> with the public key used for protocol-level PoP verification. This public key is either obtained directly from the protocol or supplied to the Verifier by the Relying Party.<a href="#section-5.2-2.5.1" class="pilcrow">¶</a></p>
@@ -1564,7 +1565,7 @@ oid = tstr  ; dotted-decimal OID string
         <h3 id="name-subject-key-in-cnf">
 <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-subject-key-in-cnf" class="section-name selfRef">Subject Key in cnf</a>
         </h3>
-<p id="section-7.2-1">This profile uses the EAT <code>cnf</code> claim defined in <span>[<a href="#RFC8747" class="cite xref">RFC8747</a>]</span> and <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span> to carry the Subject Public Key. The <code>cnf</code> claim <span class="bcp14">MUST</span> be present and <span class="bcp14">MUST</span> contain the subject public key.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.2-1">This profile uses the EAT <code>cnf</code> claim defined in <span>[<a href="#RFC8747" class="cite xref">RFC8747</a>]</span> and <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span> to carry the Subject Public Key.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
 <p id="section-7.2-2">When comparing the Subject Public Key contained in <code>cnf</code> with the public key used in a CSR or TLS end-entity certificate, the comparison <span class="bcp14">MUST</span> be performed over the public key parameters rather than over their serialized encodings. This ensures that differences in encoding formats (e.g., ASN.1 DER versus CBOR) do not cause two equivalent public keys to be incorrectly treated as unequal.<a href="#section-7.2-2" class="pilcrow">¶</a></p>
 <p id="section-7.2-3">For example:<a href="#section-7.2-3" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -1777,10 +1778,20 @@ with the Subject Key identified by the EAT <code>cnf</code> claim.<a href="#sect
       </ul>
 <p id="section-9-4">This document also requests registration of a new claim in the "JSON Web Token (JWT) Claims" registry (established by <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span>).<a href="#section-9-4" class="pilcrow">¶</a></p>
 <p id="section-9-5">The following value is to be added to this registry:<a href="#section-9-5" class="pilcrow">¶</a></p>
-<p id="section-9-6">Claim Name: key-attributes
-Claim Description: Key protection attributes and key-usage constraints associated with the Subject Key identified by the EAT cnf claim.
-Change Controller: IETF
-Reference: RFCXXXX<a href="#section-9-6" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9-6.1">
+          <p id="section-9-6.1.1">Claim Name: key-attributes<a href="#section-9-6.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-9-6.2">
+          <p id="section-9-6.2.1">Claim Description: Key protection attributes and key-usage constraints associated with the Subject Key identified by the EAT <code>cnf</code> claim.<a href="#section-9-6.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-9-6.3">
+          <p id="section-9-6.3.1">Change Controller: IETF<a href="#section-9-6.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-9-6.4">
+          <p id="section-9-6.4.1">Reference: RFCXXXX<a href="#section-9-6.4.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
 </section>
 </div>
 <div id="acknowledgments">
