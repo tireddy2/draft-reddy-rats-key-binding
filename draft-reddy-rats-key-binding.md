@@ -135,6 +135,8 @@ Key Attestation Token (KAT): An EAT signed by the KAK that conveys the Subject P
 
 Combined Attestation Bundle (CAB): A structure that bundles a Key Attestation Token (KAT) and a Platform Attestation Token (PAT) together for transport in the surrounding protocol, using the CMW collection format {{!I-D.ietf-rats-msg-wrap}}.
 
+The public key carried in the `cnf` claim is referred to as the Subject Public Key in this document, reflecting its use as the public key carried in the SubjectPublicKeyInfo field of an X.509 certificate {{!RFC5280}} in certificate enrollment and TLS authentication. In the context of the `cnf` claim defined in {{!RFC8747}} and {{!RFC7800}}, this key serves as the proof-of-possession key.
+
 # Architecture {#architecture}
 
 This document defines two deployment models for key attestation:
@@ -226,7 +228,7 @@ Upon receipt of attestation evidence for this profile, the Verifier MUST perform
 
 3. Validate the EAT `eat_nonce` claim. The EAT `eat_nonce` claim MUST be present, MUST contain a single nonce value, and MUST match the verifier-supplied nonce.
 
-4. Extract the Subject Public Key from the EAT `cnf` claim. The `cnf` claim MUST contain the subject public key.
+4. Extract the Subject Public Key from the EAT `cnf` claim. 
 
 5. Compare the Subject Public Key contained in `cnf` with the public key used for protocol-level PoP verification. This public key is either obtained directly from the protocol or supplied to the Verifier by the Relying Party.
    - In certificate enrollment, the public key is obtained from the CSR.
@@ -296,7 +298,7 @@ The `key-attributes` claim MUST contain at least one member.
 
 ## Subject Key in cnf
 
-This profile uses the EAT `cnf` claim defined in {{!RFC8747}} and {{!RFC7800}} to carry the Subject Public Key. The `cnf` claim MUST be present and MUST contain the subject public key.
+This profile uses the EAT `cnf` claim defined in {{!RFC8747}} and {{!RFC7800}} to carry the Subject Public Key. 
 
 When comparing the Subject Public Key contained in `cnf` with the public key used in a CSR or TLS end-entity certificate, the comparison MUST be performed over the public key parameters rather than over their serialized encodings. This ensures that differences in encoding formats (e.g., ASN.1 DER versus CBOR) do not cause two equivalent public keys to be incorrectly treated as unequal.
 
@@ -428,10 +430,10 @@ This document also requests registration of a new claim in the "JSON Web Token (
 
 The following value is to be added to this registry:
 
-Claim Name: key-attributes
-Claim Description: Key protection attributes and key-usage constraints associated with the Subject Key identified by the EAT cnf claim.
-Change Controller: IETF
-Reference: RFCXXXX
+* Claim Name: key-attributes
+* Claim Description: Key protection attributes and key-usage constraints associated with the Subject Key identified by the EAT `cnf` claim.
+* Change Controller: IETF
+* Reference: RFCXXXX
 
 
 # Acknowledgments
