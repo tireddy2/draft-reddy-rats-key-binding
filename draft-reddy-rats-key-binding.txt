@@ -5,8 +5,12 @@
 RATS                                                            T. Reddy
 Internet-Draft                                                     Nokia
 Intended status: Standards Track                           H. Tschofenig
-Expires: 16 September 2026                                      UniBw M.
-                                                           15 March 2026
+Expires: 7 December 2026                                        UniBw M.
+                                                              T. Fossati
+                                                                  Linaro
+                                                             I. Mihalcea
+                                                             Arm Limited
+                                                             5 June 2026
 
 
           Key Attestation for Entity Attestation Tokens (EAT)
@@ -21,7 +25,7 @@ Abstract
    authentication, to an attested execution environment.
 
    The subject public key is conveyed using the EAT cnf claim defined in
-   [RFC8747], and freshness uses the EAT nonce claim defined in
+   [RFC8747], and freshness uses the EAT eat_nonce claim defined in
    [RFC9711].  The proof of possession of the subject key is obtained
    from the surrounding protocol, such as TLS certificate-based
    authentication or CSR signature verification.  Because the EAT is
@@ -59,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 September 2026.
+   This Internet-Draft will expire on 7 December 2026.
 
 Copyright Notice
 
@@ -79,27 +83,32 @@ Table of Contents
 
    1.  Introduction
    2.  Conventions and Definitions
-   3.  Key Confirmation and Binding Profile
-     3.1.  Overview
-     3.2.  High-Level Construction
-   4.  Proof-of-Possession
-     4.1.  Freshness Requirements
-     4.2.  Verification Procedure
-   5.  Claim Definition
-     5.1.  Claim Structure
-     5.2.  Subject Key in cnf
-     5.3.  Protocol-Based PoP
-     5.4.  Key Protection Attributes
-     5.5.  Purpose
-   6.  Security Considerations
-     6.1.  Threat Model
-     6.2.  Proof-of-Possession Rationale
-     6.3.  Key Protection Properties
-     6.4.  Key Substitution Attack Illustration
-     6.5.  Mitigation of Key Substitution Attacks
-     6.6.  Claim Omission and Downgrade
-     6.7.  Scope of Guarantees
-   7.  IANA Considerations
+   3.  Architecture
+   4.  Key Confirmation and Binding Profile
+     4.1.  Overview
+     4.2.  High-Level Construction
+   5.  Proof-of-Possession
+     5.1.  Freshness Requirements
+     5.2.  Verification Procedure
+   6.  Split Model Profile
+     6.1.  Verification Procedure
+   7.  Claim Definition
+     7.1.  Claim Structure
+     7.2.  Subject Key in cnf
+     7.3.  Protocol-Based PoP
+     7.4.  Key Protection Attributes
+     7.5.  Purpose
+   8.  Security Considerations
+     8.1.  Threat Model
+     8.2.  Proof-of-Possession Rationale
+     8.3.  Binding of Key Protection Claims to the Attested
+           Environment
+     8.4.  Key Protection Properties
+     8.5.  Key Substitution Attack Illustration
+     8.6.  Mitigation of Key Substitution Attacks
+     8.7.  Claim Omission and Downgrade
+     8.8.  Scope of Guarantees
+   9.  IANA Considerations
    Acknowledgments
    Normative References
    Authors' Addresses
@@ -107,7 +116,7 @@ Table of Contents
 1.  Introduction
 
    Remote attestation enables an entity to produce attestation evidence
-   that a verifier can use to assess whether the entity’s platform state
+   that a verifier can use to assess whether the entity's platform state
    satisfies a required policy.  In certificate enrollment and
    authentication protocols (e.g., TLS), a common security policy
    requirement is that a private key used by an endpoint must be
@@ -194,6 +203,11 @@ Table of Contents
    defines a new claim for key-protection attributes and usage
    constraints, while relying on protocol-level proof of possession.
 
+   The use of directly conveyed key protection properties in attestation
+   evidence is consistent with [I-D.ietf-rats-pkix-key-attestation],
+   which defines attributes describing protection properties of managed
+   keys, such as extractable, never-extractable, sensitive, and local.
+
 2.  Conventions and Definitions
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
@@ -206,7 +220,7 @@ Table of Contents
    defined in the RATS Architecture ([RFC9334]) such as Attester,
    Relying Party, Verifier.
 
-   The reader is assumed to be familiar with common vocabulary and
+   The reader is assumed to be familiar with the common vocabulary and
    concepts defined in [RFC5280] such as certificate, signature,
    attribute, verification and validation.
 
@@ -220,7 +234,7 @@ Table of Contents
    Attestation Key, and conveyed in an Entity Attestation Token (EAT).
 
    Entity Attestation Token (EAT): A token format that conveys
-   attestation claims, as defined in [RFC9711]
+   attestation claims, as defined in [RFC9711].
 
    Subject Key: An asymmetric key pair for which the protection of the
    private component within an attested execution environment is being
@@ -254,9 +268,62 @@ Table of Contents
    assurance that the certificate private key benefits from the
    protections claimed in the attestation.
 
-3.  Key Confirmation and Binding Profile
+   Key Attestation Key (KAK): An Attestation Key used specifically for
+   signing Key Attestation Tokens in the split model (see Section 3).
+   The KAK is protected within the trusted computing base, and its
+   public key and protection properties are conveyed in the Platform
+   Attestation Token via the cnf and key-attributes claims.
 
-3.1.  Overview
+   Platform Attestation Token (PAT): An EAT signed by the platform
+   Attestation Key that conveys the state of the trusted computing base.
+   In this context, 'platform' refers to the Attester's full TCB.  The
+   KAK public key is conveyed via the cnf claim, and KAK protection
+   properties via the key-attributes claim.
+
+   Key Attestation Token (KAT): An EAT signed by the KAK that conveys
+   the Subject Public Key via the cnf claim and Subject Key protection
+   properties via the key-attributes claim.
+
+   Combined Attestation Bundle (CAB): A structure that bundles a Key
+   Attestation Token (KAT) and a Platform Attestation Token (PAT)
+   together for transport in the surrounding protocol, using the CMW
+   collection format [I-D.ietf-rats-msg-wrap].
+
+3.  Architecture
+
+   This document defines two deployment models for key attestation:
+
+   *Combined Model:* The key attestation function and platform
+   attestation function are hosted within the same trusted execution
+   environment.  A single Attestation Key (AK) signs one EAT containing
+   both platform state claims and key protection claims (cnf and key-
+   attributes).  This is the simpler model and is suitable for platforms
+   where separation of privilege between key attestation and platform
+   attestation is not required.
+
+   *Split Model:* The key attestation function and platform attestation
+   function are separate logical roles within the trusted computing
+   base, operating at different privilege levels.  Platform attestation
+   requires higher privilege than key attestation, and the split model
+   allows the key attestation function to operate at a lower privilege
+   level within the TCB.  A dedicated Key Attestation Key (KAK) signs
+   the Key Attestation Token (KAT), and a separate Platform Attestation
+   Token (PAT) is generated and signed by the platform Attestation Key.
+   The two tokens are bundled together as a Combined Attestation Bundle
+   (CAB) for transport.
+
+   In both models, proof of possession of the Subject Key is obtained
+   from the surrounding protocol, as described in Section 4.
+
+4.  Key Confirmation and Binding Profile
+
+4.1.  Overview
+
+   A foundational requirement of this profile is that the Subject Key
+   MUST be generated and held within the attested execution environment.
+   This is what gives the key-attributes claims their authority, the
+   attested environment signs attestation evidence about key material it
+   generated and controls.
 
    This document defines a CWT-based EAT profile and a new EAT claim
    that establish a cryptographic binding between a Subject Key and an
@@ -305,7 +372,7 @@ Table of Contents
    generated within the attested environment and prohibiting extraction
    of private key material.
 
-3.2.  High-Level Construction
+4.2.  High-Level Construction
 
    At a high level, the mechanism binds a certificate private key to an
    attested execution environment by combining AK-signed attestation
@@ -313,7 +380,7 @@ Table of Contents
 
    First, the attester constructs an EAT Claims Set including:
 
-   *  the verifier-provided nonce claim from [RFC9711];
+   *  the verifier-provided eat_nonce claim from [RFC9711];
 
    *  the cnf claim from [RFC8747] containing the Subject Public Key as
       COSE_Key;
@@ -339,7 +406,7 @@ Table of Contents
    protection within the attested execution environment is being
    asserted.
 
-4.  Proof-of-Possession
+5.  Proof-of-Possession
 
    The Proof of Possession (PoP) demonstrates control of the private
    component of the Subject Key.
@@ -355,9 +422,10 @@ Table of Contents
    The public key used for protocol-level PoP verification MUST
    correspond to the Subject Public Key in EAT cnf.
 
-   For this profile, the EAT nonce claim defined in [RFC9711] is the
-   mandatory freshness mechanism.  The EAT nonce claim MUST be present
-   and MUST contain a single nonce value supplied by the verifier.
+   For this profile, the EAT eat_nonce claim defined in [RFC9711] is the
+   mandatory freshness mechanism.  The EAT eat_nonce claim MUST be
+   present and MUST contain a single nonce value supplied by the
+   verifier.
 
    The nonce MUST be supplied by the verifier and MUST be unpredictable
    and unique within the verifier's replay window.
@@ -367,7 +435,7 @@ Table of Contents
    nbf, and exp claims defined in [RFC9711] to ensure that attestation
    evidence is not used outside its intended validity window.
 
-4.1.  Freshness Requirements
+5.1.  Freshness Requirements
 
    The verifier MUST provide a nonce with sufficient entropy to prevent
    replay.  The nonce is conveyed to the Attester by the Relying Party
@@ -387,20 +455,26 @@ Table of Contents
    verifier-provided nonce.  Verifiers MUST validate both the nonce and
    the applicable time-based claims when evaluating this profile.
 
-4.2.  Verification Procedure
+5.2.  Verification Procedure
 
    Upon receipt of attestation evidence for this profile, the Verifier
    MUST perform the following checks:
 
    1.  Validate the signature on the EAT using the applicable trust
-       anchors and endorsements for the Attestation Key. If this
-       validation fails, the attestation evidence MUST be rejected.
+       anchors for the Attestation Key. If this validation fails, the
+       attestation evidence MUST be rejected.
 
    2.  Validate the key-attributes claim.  The key-attributes claim MUST
-       be present and MUST contain at least one member.
+       be present and MUST contain at least one member.  Trust in the
+       key-attributes claim depends on successful appraisal of the
+       attestation evidence for the target environment in which the
+       Subject Key is generated and protected.  Such appraisal includes
+       evaluation of measurements in the attestation evidence against
+       the applicable reference values as described in the RATS
+       Architecture [RFC9334] and EAT [RFC9711].
 
-   3.  Validate the EAT nonce claim.  The EAT nonce claim MUST be
-       present, MUST contain a single nonce value, and MUST match the
+   3.  Validate the EAT eat_nonce claim.  The EAT eat_nonce claim MUST
+       be present, MUST contain a single nonce value, and MUST match the
        verifier-supplied nonce.
 
    4.  Extract the Subject Public Key from the EAT cnf claim.  This
@@ -432,13 +506,72 @@ Table of Contents
    The Verifier conveys the result of the binding verification to the
    Relying Party as part of the attestation result.
 
-5.  Claim Definition
+6.  Split Model Profile
+
+   In the split model, the key attestation function and platform
+   attestation function are separate logical roles within the trusted
+   computing base.  Two EATs are generated and bundled together as a
+   Combined Attestation Bundle (CAB) using the CMW collection format
+   [I-D.ietf-rats-msg-wrap]:
+
+   *  A Platform Attestation Token (PAT), signed by the platform
+      Attestation Key, that conveys the state of the trusted computing
+      base, the KAK public key via the cnf claim, and KAK protection
+      properties via the key-attributes claim.
+
+   *  A Key Attestation Token (KAT), signed by the Key Attestation Key
+      (KAK), that conveys the Subject Public Key via the cnf claim and
+      Subject Key protection properties via the key-attributes claim.
+
+   The KAT is signed by the KAK whose public key and protection
+   properties are attested in the PAT.  This provides cryptographic
+   binding between the two tokens without requiring a separate linkage
+   mechanism.
+
+6.1.  Verification Procedure
+
+   Upon receipt of a CAB for this profile, the Verifier MUST perform the
+   following checks:
+
+   1.  Validate the signature on the PAT using the applicable trust
+       anchors for the platform Attestation Key. If this validation
+       fails, the attestation evidence MUST be rejected.
+
+   2.  Validate the EAT eat_nonce claim in the PAT.  The eat_nonce claim
+       MUST be present, MUST contain a single nonce value, and MUST
+       match the verifier-supplied nonce.
+
+   3.  Validate the key-attributes claim in the PAT.  The key-attributes
+       claim MUST be present and MUST contain at least one member.
+       Trust in the key-attributes claim depends on successful appraisal
+       of the PAT against applicable reference values as described in
+       [RFC9334].
+
+   4.  Extract the KAK public key from the cnf claim in the PAT.
+
+   5.  Validate the signature on the KAT using the KAK public key
+       extracted in step 4.  If this validation fails, the attestation
+       evidence MUST be rejected.
+
+   6.  Validate the key-attributes claim in the KAT.  The key-attributes
+       claim MUST be present and MUST contain at least one member.
+
+   7.  Validate the EAT eat_nonce claim in the KAT.  The eat_nonce claim
+       MUST be present, MUST contain a single nonce value, and MUST
+       match the verifier-supplied nonce.
+
+   8.  Extract the Subject Public Key from the cnf claim in the KAT and
+       compare it with the public key used for protocol-level PoP
+       verification, following the same procedure defined in steps 4 and
+       5 of Section 4.2.
+
+7.  Claim Definition
 
    This document defines a new EAT claim named key-attributes that
    conveys key protection attributes and key-usage constraints for the
    Subject Key.
 
-5.1.  Claim Structure
+7.1.  Claim Structure
 
    The claim is defined using CDDL as follows:
 
@@ -458,7 +591,7 @@ Table of Contents
 
    The key-attributes claim MUST contain at least one member.
 
-5.2.  Subject Key in cnf
+7.2.  Subject Key in cnf
 
    This profile uses the EAT cnf claim defined in [RFC8747] to carry the
    Subject Public Key. The cnf claim MUST be present and MUST contain a
@@ -502,13 +635,13 @@ Table of Contents
    If the comparison fails, the key-to-platform binding is not
    established.
 
-5.3.  Protocol-Based PoP
+7.3.  Protocol-Based PoP
 
    This profile relies on protocol-level proof of possession for the
    Subject Key. This document does not define a new in-token PoP
    container or signature format.
 
-5.4.  Key Protection Attributes
+7.4.  Key Protection Attributes
 
    The key-attributes claim includes attributes describing key
    protection properties of the private component of the Subject Key.
@@ -525,7 +658,7 @@ Table of Contents
    policy when determining whether the Subject Key satisfies
    requirements for key generation, storage, or exportability.
 
-5.5.  Purpose
+7.5.  Purpose
 
    The purpose parameter identifies the key capabilities associated with
    the Subject Key.
@@ -542,9 +675,9 @@ Table of Contents
    KeyUsage extensions requested in the CSR and included in the issued
    certificate.
 
-6.  Security Considerations
+8.  Security Considerations
 
-6.1.  Threat Model
+8.1.  Threat Model
 
    This document addresses Key Substitution Attacks.  In such attacks,
    valid attestation evidence from a protected execution environment is
@@ -564,10 +697,25 @@ Table of Contents
 
    *  The verifier provides an unpredictable nonce to ensure freshness.
 
+   *  The Attester generates the Subject Key within the attested
+      execution environment and does not export the private component in
+      cleartext.  If this assumption does not hold, the key-attributes
+      claims do not accurately reflect the protection properties of the
+      Subject Key, and the security guarantees of this profile do not
+      apply.
+
+   For the split model, the following additional assumption applies:
+
+   *  The platform Attester generates and protects the KAK within the
+      trusted computing base, and the KAK private component is never
+      exported in cleartext.  If this assumption does not hold, the key-
+      attributes claims in the PAT do not accurately reflect the
+      protection properties of the KAK.
+
    If these assumptions do not hold, the security guarantees of this
    mechanism do not apply.
 
-6.2.  Proof-of-Possession Rationale
+8.2.  Proof-of-Possession Rationale
 
    The AK signature over the EAT provides evidence about the Subject Key
    and its asserted protection properties.  Protocol-level PoP
@@ -577,7 +725,34 @@ Table of Contents
    self-reported claims about the presence of the Subject Key in the
    attested environment.
 
-6.3.  Key Protection Properties
+8.3.  Binding of Key Protection Claims to the Attested Environment
+
+   The key-attributes claim conveys protection properties of the Subject
+   Key, such as non-exportability and hardware-level protection.  For
+   these claims to be trustworthy, they must be asserted by the attested
+   environment that generated and holds the Subject Key, as it is the
+   only entity with direct knowledge of and authority over the key
+   protection properties.
+
+   An alternative construction sometimes used in attestation protocols
+   is to build an unsigned claims set (UCCS) containing the Subject
+   Public Key and associated attributes, hash it, and supply the hash as
+   a challenge to an existing attestation interface.  In such
+   constructions, the attestation evidence provides an indirect
+   cryptographic binding between the claims set and the attested
+   environment.  However, a TEE-bound process acting as a proxy could
+   forward a fabricated UCCS on behalf of an untrusted caller, causing
+   the attested environment to sign claims it did not generate and
+   cannot verify.
+
+   This profile instead requires the Attestation Key (AK) to directly
+   sign the EAT Claims Set containing the key-attributes claim and the
+   Subject Public Key in cnf.  This ensures that key protection
+   attributes are conveyed as claims directly attested by the Attestor,
+   eliminating the risk of fabricated claims being indirectly bound to
+   attestation evidence.
+
+8.4.  Key Protection Properties
 
    The cnf claim establishes a cryptographic binding between the Subject
    Key and the attestation evidence.  However, the cnf claim alone does
@@ -591,7 +766,7 @@ Table of Contents
    properties and determine whether the Subject Key satisfies the
    security requirements of the deployment.
 
-6.4.  Key Substitution Attack Illustration
+8.5.  Key Substitution Attack Illustration
 
    The following example illustrates how the mechanism detects a Key
    Substitution Attack.
@@ -616,7 +791,7 @@ Table of Contents
    cryptographic binding between the certificate private key and the
    attested execution environment.
 
-6.5.  Mitigation of Key Substitution Attacks
+8.6.  Mitigation of Key Substitution Attacks
 
    This mechanism mitigates Key Substitution Attacks by requiring
    cryptographic proof that the private key used in a CSR or TLS
@@ -631,22 +806,23 @@ Table of Contents
 
    If any of these validations fail, the binding is not established.
 
-6.6.  Claim Omission and Downgrade
+8.7.  Claim Omission and Downgrade
 
    If a security policy requires that the private key corresponding to a
    certificate be generated or protected within an attested execution
    environment, the Relying Party MUST ensure that the key-attributes
-   claim defined in this document is present, that the EAT nonce claim
-   is present, that the cnf claim is present with COSE_Key, that
+   claim defined in this document is present, that the EAT eat_nonce
+   claim is present, that the cnf claim is present with COSE_Key, that
    protocol-level PoP verification succeeds, and that binding
    verification succeeds.
 
    In deployments using a separate Verifier, the Relying Party MUST
    require the Verifier to enforce the presence and successful
-   validation of the key-attributes claim, EAT nonce, cnf with COSE_Key,
-   and protocol-level PoP verification as part of attestation appraisal.
+   validation of the key-attributes claim, EAT eat_nonce, cnf with
+   COSE_Key, and protocol-level PoP verification as part of attestation
+   appraisal.
 
-6.7.  Scope of Guarantees
+8.8.  Scope of Guarantees
 
    This mechanism provides cryptographic evidence that the entity
    participating in the surrounding protocol demonstrated control of the
@@ -664,21 +840,31 @@ Table of Contents
    Such guarantees depend on platform-specific properties and lifecycle
    management outside the scope of this document.
 
-7.  IANA Considerations
+9.  IANA Considerations
 
    This document requests registration of a new claim in the "CBOR Web
    Token (CWT) Claims" registry (established by [RFC8392]).
 
    The following value is to be added to this registry:
 
-   Claim Name: key-attributes CWT Claim Key: TBD Claim Description: Key
-   protection attributes and key-usage constraints associated with the
-   Subject Key identified by the EAT cnf claim.  Claim Value Type: CBOR
-   map Change Controller: IETF Reference: RFCXXXX
+   *  Claim Name: key-attributes
+
+   *  CWT Claim Key: TBD
+
+   *  Claim Description: Key protection attributes and key-usage
+      constraints associated with the Subject Key identified by the EAT
+      cnf claim.
+
+   *  Claim Value Type: CBOR map
+
+   *  Change Controller: IETF
+
+   *  Reference: RFCXXXX
 
 Acknowledgments
 
-   TODO
+   The authors thank Paul Walters and Nathanael Ritz for the discussion
+   and comments.
 
 Normative References
 
@@ -687,9 +873,9 @@ Normative References
               T. Reddy.K, "Using Attestation in Transport Layer Security
               (TLS) and Datagram Transport Layer Security (DTLS)", Work
               in Progress, Internet-Draft, draft-fossati-seat-early-
-              attestation-03, 1 March 2026,
+              attestation-04, 27 May 2026,
               <https://datatracker.ietf.org/doc/html/draft-fossati-seat-
-              early-attestation-03>.
+              early-attestation-04>.
 
    [I-D.fossati-tls-exported-attestation]
               Fossati, T., Sardar, M. U., Reddy.K, T., Sheffer, Y.,
@@ -706,25 +892,32 @@ Normative References
               Management Protocol (CMP), for Enrollment over Secure
               Transport (EST), and for Certificate Management over CMS
               (CMC)", Work in Progress, Internet-Draft, draft-ietf-
-              lamps-attestation-freshness-05, 19 October 2025,
+              lamps-attestation-freshness-06, 20 April 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-lamps-
-              attestation-freshness-05>.
+              attestation-freshness-06>.
 
    [I-D.ietf-lamps-csr-attestation]
               Ounsworth, M., Tschofenig, H., Birkholz, H., Wiseman, M.,
               and N. Smith, "Use of Remote Attestation with
               Certification Signing Requests", Work in Progress,
-              Internet-Draft, draft-ietf-lamps-csr-attestation-23, 1
-              March 2026, <https://datatracker.ietf.org/doc/html/draft-
-              ietf-lamps-csr-attestation-23>.
+              Internet-Draft, draft-ietf-lamps-csr-attestation-27, 20
+              May 2026, <https://datatracker.ietf.org/doc/html/draft-
+              ietf-lamps-csr-attestation-27>.
+
+   [I-D.ietf-rats-msg-wrap]
+              Birkholz, H., Smith, N., Fossati, T., Tschofenig, H., and
+              D. Glaze, "RATS Conceptual Messages Wrapper (CMW)", Work
+              in Progress, Internet-Draft, draft-ietf-rats-msg-wrap-23,
+              11 December 2025, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-rats-msg-wrap-23>.
 
    [I-D.ietf-rats-pkix-key-attestation]
               Ounsworth, M., Fiset, J., Tschofenig, H., Birkholz, H.,
               Wiseman, M., and N. Smith, "Evidence Encoding for Hardware
               Security Modules", Work in Progress, Internet-Draft,
-              draft-ietf-rats-pkix-key-attestation-03, 1 March 2026,
+              draft-ietf-rats-pkix-key-attestation-05, 17 March 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-rats-
-              pkix-key-attestation-03>.
+              pkix-key-attestation-05>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -775,3 +968,13 @@ Authors' Addresses
    Neubiberg
    Germany
    Email: hannes.tschofenig@gmx.net
+
+
+   Thomas Fossati
+   Linaro
+   Email: thomas.fossati@linaro.org
+
+
+   Ionut Mihalcea
+   Arm Limited
+   Email: Ionut.Mihalcea@arm.com
