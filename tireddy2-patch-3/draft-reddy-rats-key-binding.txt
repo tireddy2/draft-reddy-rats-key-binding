@@ -5,12 +5,12 @@
 RATS                                                            T. Reddy
 Internet-Draft                                                     Nokia
 Intended status: Standards Track                           H. Tschofenig
-Expires: 6 December 2026                                        UniBw M.
+Expires: 7 December 2026                                        UniBw M.
                                                               T. Fossati
                                                                   Linaro
                                                              I. Mihalcea
                                                              Arm Limited
-                                                             4 June 2026
+                                                             5 June 2026
 
 
           Key Attestation for Entity Attestation Tokens (EAT)
@@ -25,7 +25,7 @@ Abstract
    authentication, to an attested execution environment.
 
    The subject public key is conveyed using the EAT cnf claim defined in
-   [RFC8747], and freshness uses the EAT nonce claim defined in
+   [RFC8747], and freshness uses the EAT eat_nonce claim defined in
    [RFC9711].  The proof of possession of the subject key is obtained
    from the surrounding protocol, such as TLS certificate-based
    authentication or CSR signature verification.  Because the EAT is
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 December 2026.
+   This Internet-Draft will expire on 7 December 2026.
 
 Copyright Notice
 
@@ -110,9 +110,7 @@ Table of Contents
      8.8.  Scope of Guarantees
    9.  IANA Considerations
    Acknowledgments
-   References
-     Normative References
-     Informative References
+   Normative References
    Authors' Addresses
 
 1.  Introduction
@@ -205,14 +203,6 @@ Table of Contents
    defines a new claim for key-protection attributes and usage
    constraints, while relying on protocol-level proof of possession.
 
-   Prior work on EAT-based key attestation is described in
-   [I-D.bft-rats-kat], which defines mechanisms for associating
-   cryptographic keys with attestation evidence and demonstrating
-   possession of the corresponding private key.  This document takes a
-   simpler approach, it uses the existing Attestation Key (AK) to sign a
-   single EAT that directly includes the subject public key via the cnf
-   claim and its protection properties via the key-attributes claim.
-
    The use of directly conveyed key protection properties in attestation
    evidence is consistent with [I-D.ietf-rats-pkix-key-attestation],
    which defines attributes describing protection properties of managed
@@ -279,15 +269,16 @@ Table of Contents
    protections claimed in the attestation.
 
    Key Attestation Key (KAK): An Attestation Key used specifically for
-   signing Key Attestation Tokens in the split model.  The KAK is
-   protected within the trusted computing base, and its public key and
-   protection properties are conveyed in the Platform Attestation Token
-   via the cnf and key-attributes claims.
+   signing Key Attestation Tokens in the split model (see Section 3).
+   The KAK is protected within the trusted computing base, and its
+   public key and protection properties are conveyed in the Platform
+   Attestation Token via the cnf and key-attributes claims.
 
    Platform Attestation Token (PAT): An EAT signed by the platform
-   Attestation Key that conveys platform state claims, the KAK public
-   key via the cnf claim, and KAK protection properties via the key-
-   attributes claim.
+   Attestation Key that conveys the state of the trusted computing base.
+   In this context, 'platform' refers to the Attester's full TCB.  The
+   KAK public key is conveyed via the cnf claim, and KAK protection
+   properties via the key-attributes claim.
 
    Key Attestation Token (KAT): An EAT signed by the KAK that conveys
    the Subject Public Key via the cnf claim and Subject Key protection
@@ -389,7 +380,7 @@ Table of Contents
 
    First, the attester constructs an EAT Claims Set including:
 
-   *  the verifier-provided nonce claim from [RFC9711];
+   *  [*CHANGE*] the verifier-provided eat_nonce claim from [RFC9711];
 
    *  the cnf claim from [RFC8747] containing the Subject Public Key as
       COSE_Key;
@@ -431,9 +422,10 @@ Table of Contents
    The public key used for protocol-level PoP verification MUST
    correspond to the Subject Public Key in EAT cnf.
 
-   For this profile, the EAT nonce claim defined in [RFC9711] is the
-   mandatory freshness mechanism.  The EAT nonce claim MUST be present
-   and MUST contain a single nonce value supplied by the verifier.
+   For this profile, the EAT eat_nonce claim defined in [RFC9711] is the
+   mandatory freshness mechanism.  The EAT eat_nonce claim MUST be
+   present and MUST contain a single nonce value supplied by the
+   verifier.
 
    The nonce MUST be supplied by the verifier and MUST be unpredictable
    and unique within the verifier's replay window.
@@ -481,8 +473,8 @@ Table of Contents
        the applicable reference values as described in the RATS
        Architecture [RFC9334] and EAT [RFC9711].
 
-   3.  Validate the EAT nonce claim.  The EAT nonce claim MUST be
-       present, MUST contain a single nonce value, and MUST match the
+   3.  Validate the EAT eat_nonce claim.  The EAT eat_nonce claim MUST
+       be present, MUST contain a single nonce value, and MUST match the
        verifier-supplied nonce.
 
    4.  Extract the Subject Public Key from the EAT cnf claim.  This
@@ -523,9 +515,9 @@ Table of Contents
    [I-D.ietf-rats-msg-wrap]:
 
    *  A Platform Attestation Token (PAT), signed by the platform
-      Attestation Key, that conveys platform state claims, the KAK
-      public key via the cnf claim, and KAK protection properties via
-      the key-attributes claim.
+      Attestation Key, that conveys the state of the trusted computing
+      base, the KAK public key via the cnf claim, and KAK protection
+      properties via the key-attributes claim.
 
    *  A Key Attestation Token (KAT), signed by the Key Attestation Key
       (KAK), that conveys the Subject Public Key via the cnf claim and
@@ -545,9 +537,9 @@ Table of Contents
        anchors for the platform Attestation Key. If this validation
        fails, the attestation evidence MUST be rejected.
 
-   2.  Validate the EAT nonce claim in the PAT.  The nonce claim MUST be
-       present, MUST contain a single nonce value, and MUST match the
-       verifier-supplied nonce.
+   2.  Validate the EAT eat_nonce claim in the PAT.  The eat_nonce claim
+       MUST be present, MUST contain a single nonce value, and MUST
+       match the verifier-supplied nonce.
 
    3.  Validate the key-attributes claim in the PAT.  The key-attributes
        claim MUST be present and MUST contain at least one member.
@@ -564,9 +556,9 @@ Table of Contents
    6.  Validate the key-attributes claim in the KAT.  The key-attributes
        claim MUST be present and MUST contain at least one member.
 
-   7.  Validate the EAT nonce claim in the KAT.  The nonce claim MUST be
-       present, MUST contain a single nonce value, and MUST match the
-       verifier-supplied nonce.
+   7.  Validate the EAT eat_nonce claim in the KAT.  The eat_nonce claim
+       MUST be present, MUST contain a single nonce value, and MUST
+       match the verifier-supplied nonce.
 
    8.  Extract the Subject Public Key from the cnf claim in the KAT and
        compare it with the public key used for protocol-level PoP
@@ -819,15 +811,16 @@ Table of Contents
    If a security policy requires that the private key corresponding to a
    certificate be generated or protected within an attested execution
    environment, the Relying Party MUST ensure that the key-attributes
-   claim defined in this document is present, that the EAT nonce claim
-   is present, that the cnf claim is present with COSE_Key, that
+   claim defined in this document is present, that the EAT eat_nonce
+   claim is present, that the cnf claim is present with COSE_Key, that
    protocol-level PoP verification succeeds, and that binding
    verification succeeds.
 
    In deployments using a separate Verifier, the Relying Party MUST
    require the Verifier to enforce the presence and successful
-   validation of the key-attributes claim, EAT nonce, cnf with COSE_Key,
-   and protocol-level PoP verification as part of attestation appraisal.
+   validation of the key-attributes claim, EAT eat_nonce, cnf with
+   COSE_Key, and protocol-level PoP verification as part of attestation
+   appraisal.
 
 8.8.  Scope of Guarantees
 
@@ -870,10 +863,8 @@ Table of Contents
 
 Acknowledgments
 
-   The authors thank Paul Walters, Nathanael Ritz and Thomas Fossati for
-   the discussion and comments.
-
-References
+   The authors thank Paul Walters and Nathanael Ritz for the discussion
+   and comments.
 
 Normative References
 
@@ -961,15 +952,6 @@ Normative References
               Wallace, "The Entity Attestation Token (EAT)", RFC 9711,
               DOI 10.17487/RFC9711, April 2025,
               <https://www.rfc-editor.org/rfc/rfc9711>.
-
-Informative References
-
-   [I-D.bft-rats-kat]
-              Brossard, M., Fossati, T., Tschofenig, H., Birkholz, H.,
-              and I. Mihalcea, "An EAT-based Key Attestation Token",
-              Work in Progress, Internet-Draft, draft-bft-rats-kat-06,
-              17 October 2025, <https://datatracker.ietf.org/doc/html/
-              draft-bft-rats-kat-06>.
 
 Authors' Addresses
 
