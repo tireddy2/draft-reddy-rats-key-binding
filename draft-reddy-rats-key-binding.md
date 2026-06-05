@@ -179,7 +179,7 @@ At a high level, the mechanism binds a certificate private key to an attested ex
 
 First, the attester constructs an EAT Claims Set including:
 
-- [**CHANGE**] the verifier-provided `eat_nonce` claim from {{!RFC9711}};
+- the verifier-provided `eat_nonce` claim from {{!RFC9711}};
 - the `cnf` claim from {{!RFC8747}} containing the Subject Public Key as `COSE_Key`;
 - the `key-attributes` claim defined in this document.
 
