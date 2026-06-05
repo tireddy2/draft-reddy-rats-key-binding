@@ -228,7 +228,7 @@ Upon receipt of attestation evidence for this profile, the Verifier MUST perform
 
 3. Validate the EAT `eat_nonce` claim. The EAT `eat_nonce` claim MUST be present, MUST contain a single nonce value, and MUST match the verifier-supplied nonce.
 
-4. Extract the Subject Public Key from the EAT `cnf` claim. 
+4. Extract the Subject Public Key from the EAT `cnf` claim.
 
 5. Compare the Subject Public Key contained in `cnf` with the public key used for protocol-level PoP verification. This public key is either obtained directly from the protocol or supplied to the Verifier by the Relying Party.
    - In certificate enrollment, the public key is obtained from the CSR.
