@@ -5,12 +5,12 @@
 RATS                                                            T. Reddy
 Internet-Draft                                                     Nokia
 Intended status: Standards Track                           H. Tschofenig
-Expires: 7 December 2026                                        UniBw M.
+Expires: 9 December 2026                                        UniBw M.
                                                               T. Fossati
                                                                   Linaro
                                                              I. Mihalcea
                                                              Arm Limited
-                                                             5 June 2026
+                                                             7 June 2026
 
 
           Key Attestation for Entity Attestation Tokens (EAT)
@@ -18,16 +18,17 @@ Expires: 7 December 2026                                        UniBw M.
 
 Abstract
 
-   This document defines a CWT-based Entity Attestation Token (EAT)
-   profile and a new EAT claim that cryptographically bind a private key
-   used to sign a certificate signing request (CSR), or the private key
-   corresponding to an end-entity certificate used for TLS
-   authentication, to an attested execution environment.
+   This document defines an Entity Attestation Token (EAT) profile and a
+   new EAT claim that convey the subject public key and its protection
+   properties within attestation evidence.  Combined with protocol-level
+   proof of possession from the surrounding protocol, this establishes a
+   cryptographic binding between a private key and an attested execution
+   environment.
 
    The subject public key is conveyed using the EAT cnf claim defined in
-   [RFC8747], and freshness uses the EAT eat_nonce claim defined in
-   [RFC9711].  The proof of possession of the subject key is obtained
-   from the surrounding protocol, such as TLS certificate-based
+   [RFC8747] and [RFC7800], and freshness uses the EAT eat_nonce claim
+   defined in [RFC9711].  The proof of possession of the subject key is
+   obtained from the surrounding protocol, such as TLS certificate-based
    authentication or CSR signature verification.  Because the EAT is
    signed by a hardware-backed Attestation Key (AK), successful
    verification of the EAT signature together with protocol-level proof
@@ -63,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 December 2026.
+   This Internet-Draft will expire on 9 December 2026.
 
 Copyright Notice
 
@@ -193,15 +194,16 @@ Table of Contents
    sensitive, and local that describe protection properties of keys
    managed by cryptographic modules.  These attributes can be conveyed
    using the key-attributes claim defined in this document while key
-   confirmation itself is conveyed using cnf ([RFC8747]) and protocol-
-   level proof of possession.
+   confirmation itself is conveyed using cnf ([RFC8747] and [RFC7800])
+   and protocol-level proof of possession.
 
    Appendix A.1.4 of [RFC9711] illustrates how a key and key store may
    be represented in evidence.  However, the example uses private-use
    claim labels and does not define standardized key-protection claims.
    This specification uses the standardized cnf claim from [RFC8747] and
-   defines a new claim for key-protection attributes and usage
-   constraints, while relying on protocol-level proof of possession.
+   [RFC7800] and defines a new claim for key-protection attributes and
+   usage constraints, while relying on protocol-level proof of
+   possession.
 
    The use of directly conveyed key protection properties in attestation
    evidence is consistent with [I-D.ietf-rats-pkix-key-attestation],
@@ -289,6 +291,13 @@ Table of Contents
    together for transport in the surrounding protocol, using the CMW
    collection format [I-D.ietf-rats-msg-wrap].
 
+   The public key carried in the cnf claim is referred to as the Subject
+   Public Key in this document, reflecting its use as the public key
+   carried in the SubjectPublicKeyInfo field of an X.509 certificate
+   [RFC5280] in certificate enrollment and TLS authentication.  In the
+   context of the cnf claim defined in [RFC8747] and [RFC7800], this key
+   serves as the proof-of-possession key.
+
 3.  Architecture
 
    This document defines two deployment models for key attestation:
@@ -313,7 +322,7 @@ Table of Contents
    (CAB) for transport.
 
    In both models, proof of possession of the Subject Key is obtained
-   from the surrounding protocol, as described in Section 4.
+   from the surrounding protocol, as described in Section 5.
 
 4.  Key Confirmation and Binding Profile
 
@@ -325,10 +334,9 @@ Table of Contents
    attested environment signs attestation evidence about key material it
    generated and controls.
 
-   This document defines a CWT-based EAT profile and a new EAT claim
-   that establish a cryptographic binding between a Subject Key and an
-   attested execution environment.  The profile is defined for EAT
-   conveyed as a CWT Claims Set in a COSE_Sign1 message.
+   This document defines an EAT profile and a new EAT claim that
+   establish a cryptographic binding between a Subject Key and an
+   attested execution environment.
 
    The profile provides two properties:
 
@@ -347,10 +355,9 @@ Table of Contents
    *  protocol-level proof of possession for the Subject Key.
 
    The subject public key used for protocol-level PoP verification is
-   carried in the EAT cnf claim as a COSE_Key, following [RFC8747].
-   Because the attestation evidence is authenticated by the AK, and PoP
-   is verified in the surrounding protocol, successful verification
-   establishes that:
+   carried in the EAT cnf claim.  Because the attestation evidence is
+   authenticated by the AK, and PoP is verified in the surrounding
+   protocol, successful verification establishes that:
 
    *  The attested platform state is authentic; and
 
@@ -382,8 +389,7 @@ Table of Contents
 
    *  the verifier-provided eat_nonce claim from [RFC9711];
 
-   *  the cnf claim from [RFC8747] containing the Subject Public Key as
-      COSE_Key;
+   *  the cnf claim containing the Subject Public Key;
 
    *  the key-attributes claim defined in this document.
 
@@ -477,10 +483,7 @@ Table of Contents
        be present, MUST contain a single nonce value, and MUST match the
        verifier-supplied nonce.
 
-   4.  Extract the Subject Public Key from the EAT cnf claim.  This
-       profile requires the cnf claim defined in [RFC8747] and requires
-       cnf to contain COSE_Key.  Use of Encrypted_COSE_Key or a kid-only
-       representation is outside the scope of this profile.
+   4.  Extract the Subject Public Key from the EAT cnf claim.
 
    5.  Compare the Subject Public Key contained in cnf with the public
        key used for protocol-level PoP verification.  This public key is
@@ -563,7 +566,7 @@ Table of Contents
    8.  Extract the Subject Public Key from the cnf claim in the KAT and
        compare it with the public key used for protocol-level PoP
        verification, following the same procedure defined in steps 4 and
-       5 of Section 4.2.
+       5 of Section 5.2.
 
 7.  Claim Definition
 
@@ -593,9 +596,8 @@ Table of Contents
 
 7.2.  Subject Key in cnf
 
-   This profile uses the EAT cnf claim defined in [RFC8747] to carry the
-   Subject Public Key. The cnf claim MUST be present and MUST contain a
-   COSE_Key member.
+   This profile uses the EAT cnf claim defined in [RFC8747] and
+   [RFC7800] to carry the Subject Public Key.
 
    When comparing the Subject Public Key contained in cnf with the
    public key used in a CSR or TLS end-entity certificate, the
@@ -812,15 +814,15 @@ Table of Contents
    certificate be generated or protected within an attested execution
    environment, the Relying Party MUST ensure that the key-attributes
    claim defined in this document is present, that the EAT eat_nonce
-   claim is present, that the cnf claim is present with COSE_Key, that
-   protocol-level PoP verification succeeds, and that binding
-   verification succeeds.
+   claim is present, that the cnf claim is present with the subject
+   public key, that protocol-level PoP verification succeeds, and that
+   binding verification succeeds.
 
    In deployments using a separate Verifier, the Relying Party MUST
    require the Verifier to enforce the presence and successful
-   validation of the key-attributes claim, EAT eat_nonce, cnf with
-   COSE_Key, and protocol-level PoP verification as part of attestation
-   appraisal.
+   validation of the key-attributes claim, EAT eat_nonce, cnf with the
+   subject public key, and protocol-level PoP verification as part of
+   attestation appraisal.
 
 8.8.  Scope of Guarantees
 
@@ -856,6 +858,21 @@ Table of Contents
       cnf claim.
 
    *  Claim Value Type: CBOR map
+
+   *  Change Controller: IETF
+
+   *  Reference: RFCXXXX
+
+   This document also requests registration of a new claim in the "JSON
+   Web Token (JWT) Claims" registry (established by [RFC7519]).
+
+   The following value is to be added to this registry:
+
+   *  Claim Name: key-attributes
+
+   *  Claim Description: Key protection attributes and key-usage
+      constraints associated with the Subject Key identified by the EAT
+      cnf claim.
 
    *  Change Controller: IETF
 
@@ -929,6 +946,15 @@ Normative References
               Infrastructure Certificate and Certificate Revocation List
               (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
               <https://www.rfc-editor.org/rfc/rfc5280>.
+
+   [RFC7519]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
+              (JWT)", RFC 7519, DOI 10.17487/RFC7519, May 2015,
+              <https://www.rfc-editor.org/rfc/rfc7519>.
+
+   [RFC7800]  Jones, M., Bradley, J., and H. Tschofenig, "Proof-of-
+              Possession Key Semantics for JSON Web Tokens (JWTs)",
+              RFC 7800, DOI 10.17487/RFC7800, April 2016,
+              <https://www.rfc-editor.org/rfc/rfc7800>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
