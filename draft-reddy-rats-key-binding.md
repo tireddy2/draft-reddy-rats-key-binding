@@ -439,6 +439,6 @@ The following value is to be added to this registry:
 # Acknowledgments
 {: numbered="false"}
 
-The authors thank Paul Walters and Nathanael Ritz for the discussion and comments.
+The authors thank Paul Wouters and Nathanael Ritz for the discussion and comments.
 
 --- back
