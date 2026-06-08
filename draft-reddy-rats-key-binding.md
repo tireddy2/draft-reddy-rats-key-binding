@@ -298,7 +298,7 @@ The `key-attributes` claim MUST contain at least one member.
 
 ## Subject Key in cnf
 
-This profile uses the EAT `cnf` claim defined in {{!RFC8747}} and {{!RFC7800}} to carry the Subject Public Key. 
+This profile uses the EAT `cnf` claim defined in {{!RFC8747}} and {{!RFC7800}} to carry the Subject Public Key.
 
 When comparing the Subject Public Key contained in `cnf` with the public key used in a CSR or TLS end-entity certificate, the comparison MUST be performed over the public key parameters rather than over their serialized encodings. This ensures that differences in encoding formats (e.g., ASN.1 DER versus CBOR) do not cause two equivalent public keys to be incorrectly treated as unequal.
 
