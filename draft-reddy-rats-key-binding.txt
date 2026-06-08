@@ -5,12 +5,12 @@
 RATS                                                            T. Reddy
 Internet-Draft                                                     Nokia
 Intended status: Standards Track                           H. Tschofenig
-Expires: 9 December 2026                                        UniBw M.
+Expires: 10 December 2026                                       UniBw M.
                                                               T. Fossati
                                                                   Linaro
                                                              I. Mihalcea
                                                              Arm Limited
-                                                             7 June 2026
+                                                             8 June 2026
 
 
           Key Attestation for Entity Attestation Tokens (EAT)
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 December 2026.
+   This Internet-Draft will expire on 10 December 2026.
 
 Copyright Notice
 
@@ -880,7 +880,7 @@ Table of Contents
 
 Acknowledgments
 
-   The authors thank Paul Walters and Nathanael Ritz for the discussion
+   The authors thank Paul Wouters and Nathanael Ritz for the discussion
    and comments.
 
 Normative References
