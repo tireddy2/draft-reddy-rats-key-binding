@@ -59,7 +59,7 @@ author:
        organization: Arm Limited
        email: Ionut.Mihalcea@arm.com
 
- -    
+ -
        ins: H. Birkholz
        name: Henk Birkholz
        organization: Fraunhofer SIT
