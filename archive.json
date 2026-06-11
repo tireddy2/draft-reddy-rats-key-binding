@@ -1,0 +1,998 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2026-06-11T03:29:36.868342+00:00",
+  "repo": "tireddy2/draft-reddy-rats-key-binding",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 2,
+      "id": "I_kwDORSN2L87x6sQo",
+      "title": "Countersignature is not needed",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/issues/2",
+      "state": "CLOSED",
+      "author": "tireddy2",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "If the EAT carries the Subject Public Key in the cnf claim, and the verifier checks that this key matches the key used in the CSR or TLS authentication, then the AK-signed EAT provides evidence about the platform protecting the corresponding private key, while the CSR or TLS signature proves control of that private key. I therefore do not see a need for an additional countersignature.\n\nIn the previous version, the TEE generated the PoP to provide direct evidence of possession of the Subject Key.",
+      "createdAt": "2026-03-11T14:48:47Z",
+      "updatedAt": "2026-03-15T07:13:56Z",
+      "closedAt": "2026-03-15T07:13:56Z",
+      "comments": []
+    }
+  ],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDORSN2L87JYJe5",
+      "title": "Alternative Approach using RFC 8747",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/1",
+      "state": "MERGED",
+      "author": "hannestschofenig",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Tiru, I drafted an alternative approach using CWTs, the PoP extension of CWTs, and countersignatures.\r\n\r\nI am not entire convinced about my inclusion of CMWs and about the subject public key comparison technique. I wonder whether we could re-use something from RFC 9679",
+      "createdAt": "2026-03-10T12:56:48Z",
+      "updatedAt": "2026-03-11T10:40:00Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "main",
+      "baseRefOid": "1d64e84c88d379c313454df5677b4f63fde089bf",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "rfc8747",
+      "headRefOid": "e71080145a6cdd52961888b86e5065d5bc988232",
+      "closedAt": "2026-03-11T10:40:00Z",
+      "mergedAt": "2026-03-11T10:40:00Z",
+      "mergedBy": "tireddy2",
+      "mergeCommit": {
+        "oid": "367a1b4322c6c993ceaf2536d95a12f13dfaca2e"
+      },
+      "comments": [
+        {
+          "author": "tireddy2",
+          "authorAssociation": "OWNER",
+          "body": "Thanks, Hannes. The PR looks good. It needs some more work which can be addressed in a later PR. ",
+          "createdAt": "2026-03-11T10:39:51Z",
+          "updatedAt": "2026-03-11T10:39:51Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 3,
+      "id": "PR_kwDORSN2L87Jw2a5",
+      "title": "Removed countersignature",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/3",
+      "state": "MERGED",
+      "author": "hannestschofenig",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-03-11T16:30:18Z",
+      "updatedAt": "2026-03-11T16:54:11Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "main",
+      "baseRefOid": "367a1b4322c6c993ceaf2536d95a12f13dfaca2e",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "remove-countersignature",
+      "headRefOid": "88b5face3bfc7feac9df17b4cfe3607af521be8f",
+      "closedAt": "2026-03-11T16:54:11Z",
+      "mergedAt": "2026-03-11T16:54:11Z",
+      "mergedBy": "hannestschofenig",
+      "mergeCommit": {
+        "oid": "72eb17798b32679225a88f020d291eea4962c91f"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 4,
+      "id": "PR_kwDORSN2L87Jw52u",
+      "title": "Remove CMW",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/4",
+      "state": "CLOSED",
+      "author": "hannestschofenig",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Decided to remove the discussion about CMW in the draft. The Conceptual Message Wrapper can still be used outside the token.",
+      "createdAt": "2026-03-11T16:33:07Z",
+      "updatedAt": "2026-03-11T16:34:56Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "main",
+      "baseRefOid": "367a1b4322c6c993ceaf2536d95a12f13dfaca2e",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "remove-cmw",
+      "headRefOid": "2cc677c7c0fd16e92f1871912d5f108e8f999554",
+      "closedAt": "2026-03-11T16:34:56Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 5,
+      "id": "PR_kwDORSN2L87Jw6cO",
+      "title": "Removed CMW usage",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/5",
+      "state": "MERGED",
+      "author": "hannestschofenig",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Decided to remove the discussion about CMW in the draft. The Conceptual Message Wrapper can still be used outside the token.",
+      "createdAt": "2026-03-11T16:33:34Z",
+      "updatedAt": "2026-03-11T16:54:28Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "remove-countersignature",
+      "baseRefOid": "88b5face3bfc7feac9df17b4cfe3607af521be8f",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "remove-cmw",
+      "headRefOid": "2cc677c7c0fd16e92f1871912d5f108e8f999554",
+      "closedAt": "2026-03-11T16:54:28Z",
+      "mergedAt": "2026-03-11T16:54:28Z",
+      "mergedBy": "hannestschofenig",
+      "mergeCommit": {
+        "oid": "3f5421e6eceb7e65b47970e6f8758d57a80198a6"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 6,
+      "id": "PR_kwDORSN2L87JxZMk",
+      "title": "Revert \"Removed CMW usage\"",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/6",
+      "state": "MERGED",
+      "author": "hannestschofenig",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Reverts tireddy2/draft-reddy-rats-key-binding#5",
+      "createdAt": "2026-03-11T16:56:22Z",
+      "updatedAt": "2026-03-11T16:57:31Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "remove-countersignature",
+      "baseRefOid": "3f5421e6eceb7e65b47970e6f8758d57a80198a6",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "revert-5-remove-cmw",
+      "headRefOid": "7571c7a08d6cf026802a7720f17cefa451dfbbf9",
+      "closedAt": "2026-03-11T16:57:31Z",
+      "mergedAt": "2026-03-11T16:57:31Z",
+      "mergedBy": "hannestschofenig",
+      "mergeCommit": {
+        "oid": "2a5802f3ccc5957c91e1bc539d7867b914765255"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 7,
+      "id": "PR_kwDORSN2L87Kl8Xg",
+      "title": "Cleanup draft for submission",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/7",
+      "state": "MERGED",
+      "author": "tireddy2",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-03-14T11:30:41Z",
+      "updatedAt": "2026-03-15T06:27:17Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "main",
+      "baseRefOid": "1ebc9acb340df39d8386578714ed6baff50a4813",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "tireddy2-patch-1",
+      "headRefOid": "7043b38fe5bae0d154d1cd70df5381562f75f3ac",
+      "closedAt": "2026-03-15T06:27:14Z",
+      "mergedAt": "2026-03-15T06:27:14Z",
+      "mergedBy": "hannestschofenig",
+      "mergeCommit": {
+        "oid": "6a1b8b47db8401a22c92173b81dcd72aff12642e"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORSN2L87rXHXs",
+          "commit": {
+            "abbreviatedOid": "5e7a948"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-14T11:31:05Z",
+          "updatedAt": "2026-03-14T11:31:05Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "````suggestion\nThe nonce MUST be supplied by the verifier and MUST be unpredictable and unique within the verifier's replay window.\n````",
+              "createdAt": "2026-03-14T11:31:05Z",
+              "updatedAt": "2026-03-14T11:31:05Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "id": "PR_kwDORSN2L87KuX2f",
+      "title": "Add files via upload",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/8",
+      "state": "MERGED",
+      "author": "tireddy2",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-03-15T13:57:54Z",
+      "updatedAt": "2026-03-15T13:58:25Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "main",
+      "baseRefOid": "6a1b8b47db8401a22c92173b81dcd72aff12642e",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "tireddy2-patch-1",
+      "headRefOid": "1b45412c3b7a629f5d33a24ccff293d480edae06",
+      "closedAt": "2026-03-15T13:58:08Z",
+      "mergedAt": "2026-03-15T13:58:08Z",
+      "mergedBy": "tireddy2",
+      "mergeCommit": {
+        "oid": "53c8a170342e7b2ea591f38ddb9ac6e3772035a3"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORSN2L87rczpI",
+          "commit": {
+            "abbreviatedOid": "1b45412"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-15T13:58:25Z",
+          "updatedAt": "2026-03-15T13:58:25Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "````suggestion\n*  Claim Description: Key protection attributes and key-usage constraints associated\n````",
+              "createdAt": "2026-03-15T13:58:25Z",
+              "updatedAt": "2026-03-15T13:58:25Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "id": "PR_kwDORSN2L87WO2AG",
+      "title": "Address comments from the WG",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/9",
+      "state": "MERGED",
+      "author": "tireddy2",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-04-28T06:55:56Z",
+      "updatedAt": "2026-05-29T06:47:52Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "main",
+      "baseRefOid": "53c8a170342e7b2ea591f38ddb9ac6e3772035a3",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "tireddy2-patch-2",
+      "headRefOid": "74845e7f42ecec54773d3f660c0af218dbb8e9f3",
+      "closedAt": "2026-05-29T06:47:52Z",
+      "mergedAt": "2026-05-29T06:47:52Z",
+      "mergedBy": "tireddy2",
+      "mergeCommit": {
+        "oid": "f34e15e3e7395a237812745687a668554ae54d24"
+      },
+      "comments": [
+        {
+          "author": "hannestschofenig",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Good feedback from the working group and great text to address it. Agree with everything you have written there.",
+          "createdAt": "2026-04-28T17:57:37Z",
+          "updatedAt": "2026-04-28T17:57:37Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDORSN2L875iMgr",
+          "commit": {
+            "abbreviatedOid": "87af7e8"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-28T06:56:26Z",
+          "updatedAt": "2026-04-28T06:56:27Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "````suggestion\nA foundational requirement of this profile is that the Subject Key MUST be generated and held within the attested execution environment. This is what gives the `key-attributes` claims their authority, the attested environment signs attestation evidence about key material it generated and controls.\n````",
+              "createdAt": "2026-04-28T06:56:26Z",
+              "updatedAt": "2026-04-28T06:56:27Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L87_Gu0Q",
+          "commit": {
+            "abbreviatedOid": "355bc00"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T08:56:06Z",
+          "updatedAt": "2026-05-13T08:56:06Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "This is not entirely accurate.\n\nI believe that (Hannes can confirm) our initial target was the Arm PSA architecture (i.e., attestation for IoT).\n\nHowever, we subsequently adapted the KAT framework to work in a confidential computing environment without an explicit KAK and using the \u201chash-lock\u201d trick as follows:\n1. The confidential workload (i.e., the holder of the key) assembles an UCCS KAT for the key in question.\n2. It serialises the KAT and computes its hash. (Note that the KAT contains the challenger nonce.)\n3. It uses the computed hash as the challenge to obtain Evidence from the TEE (i.e., the PAT)\n4. It wraps the UCCS KAT and the bound PAT in a suitably profiled CMW which is then signed using the confidential workload key.  This signature provides PoP for the key.",
+              "createdAt": "2026-05-13T08:56:06Z",
+              "updatedAt": "2026-05-13T08:56:06Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L87_G5SU",
+          "commit": {
+            "abbreviatedOid": "355bc00"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T09:01:37Z",
+          "updatedAt": "2026-05-13T09:01:37Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "Isn\u2019t this essentially self-certification?\n\nIn the KAT model, the successful PAT appraisal - including the PAT measurement relating to the key-holder environment - provides the RP guarantees regarding the (implicit) key attributes.",
+              "createdAt": "2026-05-13T09:01:37Z",
+              "updatedAt": "2026-05-13T09:01:37Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L87_HDMN",
+          "commit": {
+            "abbreviatedOid": "355bc00"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T09:07:17Z",
+          "updatedAt": "2026-05-13T09:07:17Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "> as the UCCS can be fabricated by any process outside the trusted boundary\n\nWhile this is true, a process outside the TEE boundary is architecturally prevented from requesting a PAT which includes measurements about itself as a \"confidential environment\u201d.  Therefore, there is no way it can construct the required binding.",
+              "createdAt": "2026-05-13T09:07:17Z",
+              "updatedAt": "2026-05-13T09:07:17Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L87_HD6z",
+          "commit": {
+            "abbreviatedOid": "355bc00"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "I have left a few comments inline.",
+          "createdAt": "2026-05-13T09:07:41Z",
+          "updatedAt": "2026-05-13T09:07:41Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABA5mxmA",
+          "commit": {
+            "abbreviatedOid": "355bc00"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-25T08:41:56Z",
+          "updatedAt": "2026-05-25T08:41:56Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "Got it, Thanks. I will replace the text with:\r\n\r\nPrior work on EAT-based key attestation is described in {{?I-D.bft-rats-kat}}, which defines mechanisms for associating cryptographic keys with attestation evidence and demonstrating possession of the corresponding private key.",
+              "createdAt": "2026-05-25T08:41:56Z",
+              "updatedAt": "2026-05-25T08:41:57Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABA5wCkg",
+          "commit": {
+            "abbreviatedOid": "355bc00"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-25T09:05:48Z",
+          "updatedAt": "2026-05-25T09:05:48Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "Thanks, I plan to add the following text:\r\n\r\nGood point, I plan to add the following text for clarity:\r\n\r\nTrust in the key-attributes claim depends on successful appraisal of the attestation evidence for the target environment in which the Subject Key is generated and protected. Such appraisal includes evaluation of measurements in the attestation evidence against the applicable reference values as described in the RATS Architecture {{!RFC9334}} and EAT {{!RFC9711}}.\r\n\r\nThe use of directly conveyed key protection properties in attestation evidence is consistent with {{!I-D.ietf-rats-pkix-key-attestation}}, which defines attributes describing protection properties of managed keys, such as extractable, never-extractable, sensitive, and local.",
+              "createdAt": "2026-05-25T09:05:48Z",
+              "updatedAt": "2026-05-25T09:05:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABA5zv9w",
+          "commit": {
+            "abbreviatedOid": "355bc00"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-25T09:18:00Z",
+          "updatedAt": "2026-05-25T09:18:01Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "I am referring to a process residing outside the TEE (for example, the split implementation of TLS discussed in our draft). I will update the text as follows:\r\n\r\nAn alternative construction sometimes used in attestation protocols is to build an unsigned claims set (UCCS) containing the Subject Public Key and associated attributes, hash it, and supply the hash as a challenge to an existing attestation interface. In such constructions, the attestation evidence provides an indirect cryptographic binding between the claims set and the attested environment.\r\n\r\nThis profile instead requires the Attestation Key (AK) to directly sign the EAT Claims Set containing the key-attributes claim and the Subject Public Key in cnf. This ensures that the key protection attributes are conveyed as claims directly attested by the Attestor, rather than as claims assembled outside the Attestor boundary and indirectly bound to the attestation evidence, as may occur in split deployment architectures where the TLS stack executes outside the TEE while only private key operations are performed within the TEE..",
+              "createdAt": "2026-05-25T09:18:01Z",
+              "updatedAt": "2026-05-25T09:18:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABBBo3HQ",
+          "commit": {
+            "abbreviatedOid": "355bc00"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-26T13:05:43Z",
+          "updatedAt": "2026-05-26T13:05:43Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "Yes, that makes perfect sense now.  What bootstraps the trust and makes the `key-attributes` believable is the successful appraisal of the key holder's execution environment.\r\n\r\nNote that the distance from draft-kat is now rather small: it\u2019s reduced to the key attributes being stated explicitly rather than implicitly.",
+              "createdAt": "2026-05-26T13:05:43Z",
+              "updatedAt": "2026-05-26T13:05:43Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABBBo45g",
+          "commit": {
+            "abbreviatedOid": "355bc00"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-26T13:05:46Z",
+          "updatedAt": "2026-05-26T13:05:46Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "> I am referring to a process residing outside the TEE (for example, the split implementation of TLS discussed in our draft).\r\n\r\nIn my comment above, I was suggesting that in the split implementation model there is no API/ABI available to the non-secure caller to request an attestation directly.\r\n\r\nIn practice, the arrangement subsumed by the sentence\r\n\r\n> [...] the UCCS can be fabricated by any process outside the trusted boundary\r\n\r\ncould only exist if the TEE-bound process, which can directly call the evidence generation ABI, is proxying the request for the non-secure, _authenticated_, caller, not just any process outside the TEE boundary.",
+              "createdAt": "2026-05-26T13:05:46Z",
+              "updatedAt": "2026-05-26T13:05:46Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABBXtCmQ",
+          "commit": {
+            "abbreviatedOid": "355bc00"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-29T05:45:02Z",
+          "updatedAt": "2026-05-29T05:45:03Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "Yes, we can work together to merge these drafts.  ",
+              "createdAt": "2026-05-29T05:45:02Z",
+              "updatedAt": "2026-05-29T05:45:03Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABBXzXHQ",
+          "commit": {
+            "abbreviatedOid": "355bc00"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-29T06:06:52Z",
+          "updatedAt": "2026-05-29T06:06:52Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "Thanks for the clarification, fixed text as follows:\r\n\r\nAn alternative construction sometimes used in attestation protocols is to build an unsigned claims set (UCCS) containing the Subject Public Key and associated attributes, hash it, and supply the hash as a challenge to an existing attestation interface. In such constructions, the attestation evidence provides an indirect cryptographic binding between the claims set and the attested environment. However, a TEE-bound process acting as a proxy could forward a fabricated UCCS on behalf of an untrusted caller, causing the attested environment to sign claims it did not generate and cannot verify.\r\n\r\nThis profile instead requires the Attestation Key (AK) to directly sign the EAT Claims Set containing the key-attributes claim and the Subject Public Key in cnf. This ensures that key protection attributes are conveyed as claims directly attested by the Attestor, eliminating the risk of fabricated claims being indirectly bound to attestation evidence.",
+              "createdAt": "2026-05-29T06:06:52Z",
+              "updatedAt": "2026-05-29T06:06:52Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABBX54xA",
+          "commit": {
+            "abbreviatedOid": "355bc00"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-29T06:25:47Z",
+          "updatedAt": "2026-05-29T06:25:47Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "> Yes, we can work together to merge these drafts.\r\n\r\nSGTM!",
+              "createdAt": "2026-05-29T06:25:47Z",
+              "updatedAt": "2026-05-29T06:25:47Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "id": "PR_kwDORSN2L87ioOL7",
+      "title": "Merge with bft-rats-kat",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/10",
+      "state": "MERGED",
+      "author": "tireddy2",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-06-04T10:08:31Z",
+      "updatedAt": "2026-06-05T07:36:13Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "main",
+      "baseRefOid": "f34e15e3e7395a237812745687a668554ae54d24",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "tireddy2-patch-3",
+      "headRefOid": "6edaa502b8591cf6ffb1b6ad4820de581b43dcc0",
+      "closedAt": "2026-06-05T07:36:13Z",
+      "mergedAt": "2026-06-05T07:36:13Z",
+      "mergedBy": "tireddy2",
+      "mergeCommit": {
+        "oid": "30c7c81259ec910216bf0e97272b3f5fec896aa2"
+      },
+      "comments": [
+        {
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Scope question: This is currently defined for CBOR/CWT, but EAT also supports JSON/JWT.\r\nAre there use cases that require JSON?",
+          "createdAt": "2026-06-05T07:10:57Z",
+          "updatedAt": "2026-06-05T07:10:57Z"
+        },
+        {
+          "author": "tireddy2",
+          "authorAssociation": "OWNER",
+          "body": "> Scope question: This is currently defined for CBOR/CWT, but EAT also supports JSON/JWT. Are there use cases that require JSON?\r\n\r\nIt may be useful for ACME which uses JSON, I will raise a separate PR.",
+          "createdAt": "2026-06-05T07:35:40Z",
+          "updatedAt": "2026-06-05T07:35:40Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDORSN2L88AAAABB_ZEIg",
+          "commit": {
+            "abbreviatedOid": "9f7f04d"
+          },
+          "author": "ionut-arm",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Looks good overall, couple of minor comments / questions below",
+          "createdAt": "2026-06-04T14:13:12Z",
+          "updatedAt": "2026-06-04T14:31:04Z",
+          "comments": [
+            {
+              "originalPosition": 32,
+              "body": "Note that this seems to be the first place where \"split model\" is mentioned in the document. Might be worth putting a reference to the next section.",
+              "createdAt": "2026-06-04T14:13:12Z",
+              "updatedAt": "2026-06-04T14:31:04Z"
+            },
+            {
+              "originalPosition": 34,
+              "body": "I wonder if we want to be a bit more loose here with the wording. Currently it sounds as if the PAT only covers the lowest layer of attestation (the hardware), but I think we'd better make it about the state of the whole TCB. In CCA, for example, there's a platform token, a realm token, and now a key token.\n\nThoughts?",
+              "createdAt": "2026-06-04T14:20:09Z",
+              "updatedAt": "2026-06-04T14:31:04Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABCAovmA",
+          "commit": {
+            "abbreviatedOid": "9f7f04d"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-04T17:04:48Z",
+          "updatedAt": "2026-06-04T17:04:48Z",
+          "comments": [
+            {
+              "originalPosition": 34,
+              "body": "I agree with Ionut. The word \u201cplatform\u201d, at least in Arm circles, tends to be associated with the lower layers of the TCB.\r\nPerhaps \"Attester\u2019s TCB\u201d _may_ be more generally applicable.",
+              "createdAt": "2026-06-04T17:04:48Z",
+              "updatedAt": "2026-06-04T17:04:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABCEwIDg",
+          "commit": {
+            "abbreviatedOid": "9f7f04d"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "LGTM, thanks!",
+          "createdAt": "2026-06-05T06:55:18Z",
+          "updatedAt": "2026-06-05T07:08:18Z",
+          "comments": [
+            {
+              "originalPosition": 1,
+              "body": "Now that they are merged, perhaps L99 can go, and we can remove the ref too.",
+              "createdAt": "2026-06-05T06:55:18Z",
+              "updatedAt": "2026-06-05T07:08:18Z"
+            },
+            {
+              "originalPosition": 94,
+              "body": "fly-by note: EAT calls this `eat_nonce` to differentiate it from OAuth 2\u2019s `nonce`",
+              "createdAt": "2026-06-05T07:07:27Z",
+              "updatedAt": "2026-06-05T07:08:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABCE-CYA",
+          "commit": {
+            "abbreviatedOid": "9f7f04d"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-05T07:32:42Z",
+          "updatedAt": "2026-06-05T07:32:43Z",
+          "comments": [
+            {
+              "originalPosition": 32,
+              "body": "Added reference. ",
+              "createdAt": "2026-06-05T07:32:43Z",
+              "updatedAt": "2026-06-05T07:32:43Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABCE-Taw",
+          "commit": {
+            "abbreviatedOid": "9f7f04d"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-05T07:33:30Z",
+          "updatedAt": "2026-06-05T07:33:30Z",
+          "comments": [
+            {
+              "originalPosition": 34,
+              "body": "Fixed terminology. ",
+              "createdAt": "2026-06-05T07:33:30Z",
+              "updatedAt": "2026-06-05T07:33:31Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABCE-Xpg",
+          "commit": {
+            "abbreviatedOid": "9f7f04d"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-05T07:33:42Z",
+          "updatedAt": "2026-06-05T07:33:42Z",
+          "comments": [
+            {
+              "originalPosition": 94,
+              "body": "Good point, fixed. ",
+              "createdAt": "2026-06-05T07:33:42Z",
+              "updatedAt": "2026-06-05T07:33:42Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABCE_bCQ",
+          "commit": {
+            "abbreviatedOid": "9f7f04d"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-05T07:35:53Z",
+          "updatedAt": "2026-06-05T07:35:54Z",
+          "comments": [
+            {
+              "originalPosition": 1,
+              "body": "Agreed, removed it. ",
+              "createdAt": "2026-06-05T07:35:53Z",
+              "updatedAt": "2026-06-05T07:35:54Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "id": "PR_kwDORSN2L87jEl9R",
+      "title": "Address pending issues",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/11",
+      "state": "MERGED",
+      "author": "tireddy2",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-06-05T11:04:43Z",
+      "updatedAt": "2026-06-07T13:15:07Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "main",
+      "baseRefOid": "30c7c81259ec910216bf0e97272b3f5fec896aa2",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "tireddy2-patch-4",
+      "headRefOid": "6303add38cedf9d674d415365ce77db81df92b80",
+      "closedAt": "2026-06-07T13:15:07Z",
+      "mergedAt": "2026-06-07T13:15:07Z",
+      "mergedBy": "tireddy2",
+      "mergeCommit": {
+        "oid": "0ee5e44aee2708cd4906be0236aa2c443a33f06e"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORSN2L88AAAABCGQ5FQ",
+          "commit": {
+            "abbreviatedOid": "209b750"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-05T11:05:28Z",
+          "updatedAt": "2026-06-05T11:05:28Z",
+          "comments": [
+            {
+              "originalPosition": 145,
+              "body": "````suggestion\nThis profile uses the EAT `cnf` claim defined in {{!RFC8747}} and {{!RFC7800}} to carry the Subject Public Key.\n````",
+              "createdAt": "2026-06-05T11:05:28Z",
+              "updatedAt": "2026-06-05T11:05:28Z"
+            },
+            {
+              "originalPosition": 113,
+              "body": "````suggestion\n4. Extract the Subject Public Key from the EAT `cnf` claim.\n````",
+              "createdAt": "2026-06-05T11:05:28Z",
+              "updatedAt": "2026-06-05T11:05:28Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABCGRX-Q",
+          "commit": {
+            "abbreviatedOid": "6e16819"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-05T11:06:28Z",
+          "updatedAt": "2026-06-05T11:06:29Z",
+          "comments": [
+            {
+              "originalPosition": 113,
+              "body": "````suggestion\n4. Extract the Subject Public Key from the EAT `cnf` claim.\n````",
+              "createdAt": "2026-06-05T11:06:28Z",
+              "updatedAt": "2026-06-05T11:06:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABCG-qYA",
+          "commit": {
+            "abbreviatedOid": "6303add"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "thank you!",
+          "createdAt": "2026-06-05T13:11:10Z",
+          "updatedAt": "2026-06-05T13:11:10Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABCHGVLQ",
+          "commit": {
+            "abbreviatedOid": "6303add"
+          },
+          "author": "ionut-arm",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "looks good, thank you",
+          "createdAt": "2026-06-05T13:29:40Z",
+          "updatedAt": "2026-06-05T13:29:40Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "id": "PR_kwDORSN2L87jz9rs",
+      "title": "Fix name",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/12",
+      "state": "MERGED",
+      "author": "tireddy2",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-06-08T08:14:20Z",
+      "updatedAt": "2026-06-08T08:19:06Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "main",
+      "baseRefOid": "0ee5e44aee2708cd4906be0236aa2c443a33f06e",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "tireddy2-patch-5",
+      "headRefOid": "9abe6b7e563db85370297008870ea3a8081e4917",
+      "closedAt": "2026-06-08T08:19:06Z",
+      "mergedAt": "2026-06-08T08:19:06Z",
+      "mergedBy": "tireddy2",
+      "mergeCommit": {
+        "oid": "2f810a407f4f814fa08e430b6ddfa40568ce74ea"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORSN2L88AAAABCRlpvQ",
+          "commit": {
+            "abbreviatedOid": "24ffbe5"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-08T08:14:51Z",
+          "updatedAt": "2026-06-08T08:14:51Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "````suggestion\nThis profile uses the EAT `cnf` claim defined in {{!RFC8747}} and {{!RFC7800}} to carry the Subject Public Key.\n````",
+              "createdAt": "2026-06-08T08:14:51Z",
+              "updatedAt": "2026-06-08T08:14:51Z"
+            },
+            {
+              "originalPosition": 5,
+              "body": "````suggestion\n4. Extract the Subject Public Key from the EAT `cnf` claim.\n````",
+              "createdAt": "2026-06-08T08:14:51Z",
+              "updatedAt": "2026-06-08T08:14:51Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "id": "PR_kwDORSN2L87kRGv_",
+      "title": "adding Henk",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/13",
+      "state": "OPEN",
+      "author": "henkbirkholz",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-06-09T07:36:31Z",
+      "updatedAt": "2026-06-09T08:03:15Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "main",
+      "baseRefOid": "2f810a407f4f814fa08e430b6ddfa40568ce74ea",
+      "headRepository": "henkbirkholz/draft-reddy-rats-key-binding",
+      "headRefName": "main",
+      "headRefOid": "6c4a95c503df9e59c815924eae413cd1ac8b0ee8",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORSN2L88AAAABCaCSQA",
+          "commit": {
+            "abbreviatedOid": "52c0dfc"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-09T08:00:27Z",
+          "updatedAt": "2026-06-09T08:00:27Z",
+          "comments": []
+        }
+      ]
+    }
+  ]
+}
