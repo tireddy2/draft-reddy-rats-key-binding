@@ -5,12 +5,14 @@
 RATS                                                            T. Reddy
 Internet-Draft                                                     Nokia
 Intended status: Standards Track                           H. Tschofenig
-Expires: 10 December 2026                                       UniBw M.
+Expires: 25 December 2026                                       UniBw M.
                                                               T. Fossati
                                                                   Linaro
                                                              I. Mihalcea
                                                              Arm Limited
-                                                             8 June 2026
+                                                             H. Birkholz
+                                                          Fraunhofer SIT
+                                                            23 June 2026
 
 
           Key Attestation for Entity Attestation Tokens (EAT)
@@ -64,7 +66,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 December 2026.
+   This Internet-Draft will expire on 25 December 2026.
 
 Copyright Notice
 
@@ -917,9 +919,9 @@ Normative References
               Ounsworth, M., Tschofenig, H., Birkholz, H., Wiseman, M.,
               and N. Smith, "Use of Remote Attestation with
               Certification Signing Requests", Work in Progress,
-              Internet-Draft, draft-ietf-lamps-csr-attestation-27, 20
-              May 2026, <https://datatracker.ietf.org/doc/html/draft-
-              ietf-lamps-csr-attestation-27>.
+              Internet-Draft, draft-ietf-lamps-csr-attestation-28, 16
+              June 2026, <https://datatracker.ietf.org/doc/html/draft-
+              ietf-lamps-csr-attestation-28>.
 
    [I-D.ietf-rats-msg-wrap]
               Birkholz, H., Smith, N., Fossati, T., Tschofenig, H., and
@@ -1004,3 +1006,8 @@ Authors' Addresses
    Ionut Mihalcea
    Arm Limited
    Email: Ionut.Mihalcea@arm.com
+
+
+   Henk Birkholz
+   Fraunhofer SIT
+   Email: henk.birkholz@ietf.contact
