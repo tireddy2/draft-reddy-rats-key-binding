@@ -10,7 +10,7 @@ date:
 consensus: true
 v: 3
 area: "Security"
-workgroup: "RATS"
+workgroup: "Remote ATtestation ProcedureS"
 keyword:
  - PQC
  - COSE
@@ -20,7 +20,7 @@ keyword:
 
 
 venue:
-  group: "RATS"
+  group: "Remote ATtestation ProcedureS"
   type: "Working Group"
   mail: "rats@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/rats/"
