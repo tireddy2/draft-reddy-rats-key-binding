@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-11T03:29:36.868342+00:00",
+  "timestamp": "2026-06-25T02:47:41.774410+00:00",
   "repo": "tireddy2/draft-reddy-rats-key-binding",
   "labels": [
     {
@@ -959,24 +959,26 @@
       "id": "PR_kwDORSN2L87kRGv_",
       "title": "adding Henk",
       "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/13",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "henkbirkholz",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-06-09T07:36:31Z",
-      "updatedAt": "2026-06-09T08:03:15Z",
+      "updatedAt": "2026-06-23T10:37:25Z",
       "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
       "baseRefName": "main",
       "baseRefOid": "2f810a407f4f814fa08e430b6ddfa40568ce74ea",
       "headRepository": "henkbirkholz/draft-reddy-rats-key-binding",
       "headRefName": "main",
       "headRefOid": "6c4a95c503df9e59c815924eae413cd1ac8b0ee8",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-06-23T10:37:25Z",
+      "mergedAt": "2026-06-23T10:37:24Z",
+      "mergedBy": "thomas-fossati",
+      "mergeCommit": {
+        "oid": "16932389365ae44c67a9807a8963b7fdc476fd66"
+      },
       "comments": [],
       "reviews": [
         {
@@ -993,6 +995,32 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 14,
+      "id": "PR_kwDORSN2L87pobhM",
+      "title": "chores: make update-venue update-files",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/14",
+      "state": "OPEN",
+      "author": "thomas-fossati",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-06-23T12:02:47Z",
+      "updatedAt": "2026-06-23T12:02:47Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "main",
+      "baseRefOid": "16932389365ae44c67a9807a8963b7fdc476fd66",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "updates",
+      "headRefOid": "a947a0c0186c45fe9114130033a09a47e4511d29",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
