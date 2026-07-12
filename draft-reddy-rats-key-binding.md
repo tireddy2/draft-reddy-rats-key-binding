@@ -418,6 +418,33 @@ It does not guarantee:
 
 Such guarantees depend on platform-specific properties and lifecycle management outside the scope of this document.
 
+# Privacy Considerations
+
+Attestation evidence in this profile is signed by a hardware-backed Attestation Key and conveys claims about the platform state and the Subject Key. This evidence can carry stable, hardware-backed identifiers that enable correlation of certificate enrollments and TLS authentication events across time and across Relying Parties.
+
+## Correlation via Stable Identifiers
+
+The following elements of the evidence can act as persistent identifiers:
+
+- The Attestation Key and the trust anchors or certificate chain used to validate the EAT signature. These may be unique to a device or to a small population of devices.
+- The platform state measurements conveyed in the EAT, which can reveal the make, model, firmware version, or manufacturing batch of the Attester.
+- In the split model, the KAK public key conveyed in the `cnf` claim of the Platform Attestation Token. If the KAK is a long-lived, device-resident key, its public key functions as a persistent identifier across the enrollments in which it appears.
+- The Subject Public Key conveyed in the `cnf` claim. If the same Subject Key is reused across enrollments, it is directly correlatable.
+
+Because the same evidence may be presented to more than one Relying Party or Certification Authority, these identifiers can allow independent parties to link certificate requests to a single Attester.
+
+## Data Minimization
+
+The Attester SHOULD include only the claims required by the Verifier's policy. The `key-attributes` claim SHOULD convey only the attributes and `purpose` object identifiers necessary for the Relying Party to make its authorization decision. Evidence SHOULD NOT carry identifiers beyond those needed to appraise the platform state and the Subject Key.
+
+Where distinct certificates are requested for unrelated purposes, generating a distinct Subject Key per enrollment limits correlation through the `cnf` claim. This does not remove correlation through the Attestation Key, the KAK, or the platform state measurements.
+
+## Unlinkability
+
+Where unlinkability across enrollments or across Relying Parties is required, deployments SHOULD consider the privacy-preserving mechanisms described in the RATS Architecture {{!RFC9334}}, such as per-transaction Attestation Keys or a Verifier acting as an intermediary that returns Attestation Results without exposing the underlying evidence to the Relying Party. The identifier considerations for EAT claims described in {{!RFC9711}} also apply to the claims used in this profile.
+
+The verifier-provided `eat_nonce` is supplied fresh for each attestation and does not itself introduce a persistent identifier.
+
 # IANA Considerations {#IANA}
 
 This document requests registration of a new claim in the "CBOR Web Token (CWT) Claims" registry (established by {{!RFC8392}}).
