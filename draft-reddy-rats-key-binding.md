@@ -406,6 +406,14 @@ If a security policy requires that the private key corresponding to a certificat
 
 In deployments using a separate Verifier, the Relying Party MUST require the Verifier to enforce the presence and successful validation of the `key-attributes` claim, EAT `eat_nonce`, `cnf` with the subject public key, and protocol-level PoP verification as part of attestation appraisal.
 
+## Freshness of Proof of Possession
+
+The `eat_nonce` claim establishes the freshness of the attestation evidence, because the nonce is carried inside the EAT and the EAT is signed by the Attestation Key. It does not by itself establish the freshness of the protocol-level proof of possession of the Subject Key, because the EAT is signed by the Attestation Key rather than by the Subject Key. A fresh EAT demonstrates a live Attestation Key, but does not on its own demonstrate that the Subject Key private component was exercised during the current protocol interaction.
+
+The freshness of the proof of possession therefore depends on the surrounding protocol. In TLS certificate-based authentication, the proof of possession is the CertificateVerify signature, which is computed over the handshake transcript and is inherently fresh for the current connection. In certificate enrollment, a PKCS#10 CSR signature is computed only over the CertificationRequestInfo and carries no verifier-provided freshness, so a captured CSR signature can be replayed in a later transaction.
+
+To support the guarantee that control of the Subject Key private component was demonstrated during the current protocol interaction, the proof-of-possession operation MUST be bound to verifier-provided freshness for that transaction. In certificate enrollment, the CSR signature SHOULD cover a verifier-provided challenge, so that a single transaction is proven fresh for both the attestation and the proof of possession. Where the proof-of-possession operation cannot be bound to verifier-provided freshness, the mechanism assures that the Subject Key was controlled at some earlier point, but not necessarily during the current interaction.
+
 ## Scope of Guarantees
 
 This mechanism provides cryptographic evidence that the entity participating in the surrounding protocol demonstrated control of the private component of the Subject Key during protocol execution.
