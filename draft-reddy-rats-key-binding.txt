@@ -2,17 +2,17 @@
 
 
 
-RATS                                                            T. Reddy
+Remote ATtestation ProcedureS                                   T. Reddy
 Internet-Draft                                                     Nokia
 Intended status: Standards Track                           H. Tschofenig
-Expires: 25 December 2026                                       UniBw M.
+Expires: 21 January 2027                                        UniBw M.
                                                               T. Fossati
                                                                   Linaro
                                                              I. Mihalcea
                                                              Arm Limited
                                                              H. Birkholz
                                                           Fraunhofer SIT
-                                                            23 June 2026
+                                                            20 July 2026
 
 
           Key Attestation for Entity Attestation Tokens (EAT)
@@ -46,10 +46,10 @@ About This Document
    Status information for this document may be found at
    https://datatracker.ietf.org/doc/draft-reddy-rats-key-binding/.
 
-   Discussion of this document takes place on the RATS Working Group
-   mailing list (mailto:rats@ietf.org), which is archived at
-   https://mailarchive.ietf.org/arch/browse/rats/.  Subscribe at
-   https://www.ietf.org/mailman/listinfo/rats/.
+   Discussion of this document takes place on the Remote ATtestation
+   ProcedureS Working Group mailing list (mailto:rats@ietf.org), which
+   is archived at https://mailarchive.ietf.org/arch/browse/rats/.
+   Subscribe at https://www.ietf.org/mailman/listinfo/rats/.
 
 Status of This Memo
 
@@ -66,7 +66,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 December 2026.
+   This Internet-Draft will expire on 21 January 2027.
 
 Copyright Notice
 
@@ -892,9 +892,9 @@ Normative References
               T. Reddy.K, "Using Attestation in Transport Layer Security
               (TLS) and Datagram Transport Layer Security (DTLS)", Work
               in Progress, Internet-Draft, draft-fossati-seat-early-
-              attestation-04, 27 May 2026,
+              attestation-05, 3 July 2026,
               <https://datatracker.ietf.org/doc/html/draft-fossati-seat-
-              early-attestation-04>.
+              early-attestation-05>.
 
    [I-D.fossati-tls-exported-attestation]
               Fossati, T., Sardar, M. U., Reddy.K, T., Sheffer, Y.,
@@ -906,14 +906,11 @@ Normative References
 
    [I-D.ietf-lamps-attestation-freshness]
               Tschofenig, H., Brockhaus, H., Mandel, J., and S. Turner,
-              "Nonce-based Freshness for Remote Attestation in
-              Certificate Signing Requests (CSRs) for the Certification
-              Management Protocol (CMP), for Enrollment over Secure
-              Transport (EST), and for Certificate Management over CMS
-              (CMC)", Work in Progress, Internet-Draft, draft-ietf-
-              lamps-attestation-freshness-06, 20 April 2026,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-lamps-
-              attestation-freshness-06>.
+              "Requesting a Freshness Nonce for Attestation Evidence in
+              Certificate Signing Requests", Work in Progress, Internet-
+              Draft, draft-ietf-lamps-attestation-freshness-08, 4 July
+              2026, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              lamps-attestation-freshness-08>.
 
    [I-D.ietf-lamps-csr-attestation]
               Ounsworth, M., Tschofenig, H., Birkholz, H., Wiseman, M.,
@@ -931,12 +928,12 @@ Normative References
               draft-ietf-rats-msg-wrap-23>.
 
    [I-D.ietf-rats-pkix-key-attestation]
-              Ounsworth, M., Fiset, J., Tschofenig, H., Birkholz, H.,
+              Fiset, J., Ounsworth, M., Tschofenig, H., Birkholz, H.,
               Wiseman, M., and N. Smith, "Evidence Encoding for Hardware
               Security Modules", Work in Progress, Internet-Draft,
-              draft-ietf-rats-pkix-key-attestation-05, 17 March 2026,
+              draft-ietf-rats-pkix-key-attestation-07, 5 July 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-rats-
-              pkix-key-attestation-05>.
+              pkix-key-attestation-07>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
