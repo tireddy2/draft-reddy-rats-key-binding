@@ -1,8 +1,8 @@
 <!-- regenerate: on (set to off if you edit this file) -->
 
-# A Key Binding Claim for Entity Attestation Tokens (EAT)
+# Key Attestation for Entity Attestation Tokens (EAT)
 
-This is the working area for the individual Internet-Draft, "A Key Binding Claim for Entity Attestation Tokens (EAT)".
+This is the working area for the individual Internet-Draft, "Key Attestation for Entity Attestation Tokens (EAT)".
 
 * [Editor's Copy](https://tireddy2.github.io/draft-reddy-rats-key-binding/#go.draft-reddy-rats-key-binding.html)
 * [Datatracker Page](https://datatracker.ietf.org/doc/draft-reddy-rats-key-binding)
@@ -13,7 +13,7 @@ This is the working area for the individual Internet-Draft, "A Key Binding Claim
 ## Contributing
 
 See the
-[guidelines for contributions](https://github.com/tireddy2/draft-reddy-rats-key-binding/blob//CONTRIBUTING.md).
+[guidelines for contributions](https://github.com/tireddy2/draft-reddy-rats-key-binding/blob/main/CONTRIBUTING.md).
 
 The contributing file also has tips on how to make contributions, if you
 don't already know how to do that.
