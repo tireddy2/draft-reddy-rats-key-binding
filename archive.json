@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-12T02:13:17.562076+00:00",
+  "timestamp": "2026-07-21T02:10:09.416914+00:00",
   "repo": "tireddy2/draft-reddy-rats-key-binding",
   "labels": [
     {
@@ -1017,24 +1017,26 @@
       "id": "PR_kwDORSN2L87pobhM",
       "title": "chores: make update-venue update-files",
       "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/14",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "thomas-fossati",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-06-23T12:02:47Z",
-      "updatedAt": "2026-06-23T12:02:47Z",
+      "updatedAt": "2026-07-20T15:27:58Z",
       "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
       "baseRefName": "main",
       "baseRefOid": "16932389365ae44c67a9807a8963b7fdc476fd66",
       "headRepository": "tireddy2/draft-reddy-rats-key-binding",
       "headRefName": "updates",
       "headRefOid": "a947a0c0186c45fe9114130033a09a47e4511d29",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-07-20T15:27:58Z",
+      "mergedAt": "2026-07-20T15:27:58Z",
+      "mergedBy": "tireddy2",
+      "mergeCommit": {
+        "oid": "1035c73a9dd232982d26a5b8bb030cb76bbbc4a1"
+      },
       "comments": [],
       "reviews": []
     },
