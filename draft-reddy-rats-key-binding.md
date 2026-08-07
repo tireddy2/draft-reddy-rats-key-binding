@@ -406,6 +406,15 @@ If a security policy requires that the private key corresponding to a certificat
 
 In deployments using a separate Verifier, the Relying Party MUST require the Verifier to enforce the presence and successful validation of the `key-attributes` claim, EAT `eat_nonce`, `cnf` with the subject public key, and protocol-level PoP verification as part of attestation appraisal.
 
+## Freshness and Replay Protection
+
+The `eat_nonce` claim establishes the freshness of the Evidence, allowing the Verifier to determine that the AK-signed EAT is generated for the TLS connection or certificate enrollment request currently being evaluated.
+Because the Subject Public Key is carried in the `cnf` claim of the same EAT, the claim that this specific Subject Key is protected within the attested environment is likewise fresh.
+
+In TLS certificate-based authentication, the `eat_nonce` claim is bound to the TLS connection, as described in {{!I-D.fossati-seat-expat}} and {{!I-D.fossati-seat-early-attestation}}. Because the nonce is unique to each connection, the freshness of the Evidence and of the `cnf` claim is established for that connection, and an EAT captured from this connection cannot be replayed in a different connection.
+
+In certificate enrollment, the freshness of the Evidence is established by a Verifier-provided nonce carried within the Evidence, as specified in {{!I-D.ietf-lamps-attestation-freshness}}. Because the nonce is unique to each enrollment request, the freshness of the Evidence and of the `cnf` claim is established for that request, and an EAT captured from a previous enrollment request cannot be replayed in a different one.
+
 ## Scope of Guarantees
 
 This mechanism provides cryptographic evidence that the entity participating in the surrounding protocol demonstrated control of the private component of the Subject Key during protocol execution.
