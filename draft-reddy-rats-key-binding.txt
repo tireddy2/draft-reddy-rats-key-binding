@@ -5,14 +5,14 @@
 Remote ATtestation ProcedureS                                   T. Reddy
 Internet-Draft                                                     Nokia
 Intended status: Standards Track                           H. Tschofenig
-Expires: 21 January 2027                                        UniBw M.
+Expires: 13 February 2027                                       UniBw M.
                                                               T. Fossati
                                                                   Linaro
                                                              I. Mihalcea
                                                              Arm Limited
                                                              H. Birkholz
                                                           Fraunhofer SIT
-                                                            20 July 2026
+                                                          12 August 2026
 
 
           Key Attestation for Entity Attestation Tokens (EAT)
@@ -66,7 +66,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 January 2027.
+   This Internet-Draft will expire on 13 February 2027.
 
 Copyright Notice
 
@@ -110,10 +110,13 @@ Table of Contents
      8.5.  Key Substitution Attack Illustration
      8.6.  Mitigation of Key Substitution Attacks
      8.7.  Claim Omission and Downgrade
-     8.8.  Scope of Guarantees
+     8.8.  Freshness and Replay Protection
+     8.9.  Scope of Guarantees
    9.  IANA Considerations
    Acknowledgments
-   Normative References
+   References
+     Normative References
+     Informative References
    Authors' Addresses
 
 1.  Introduction
@@ -826,7 +829,32 @@ Table of Contents
    subject public key, and protocol-level PoP verification as part of
    attestation appraisal.
 
-8.8.  Scope of Guarantees
+8.8.  Freshness and Replay Protection
+
+   The eat_nonce claim establishes the freshness of the Evidence,
+   allowing the Verifier to determine that the AK-signed EAT is
+   generated for the TLS connection or certificate enrollment request
+   currently being evaluated.  Because the Subject Public Key is carried
+   in the cnf claim of the same EAT, the claim that this specific
+   Subject Key is protected within the attested environment is likewise
+   fresh.
+
+   In TLS certificate-based authentication, the eat_nonce claim is bound
+   to the TLS connection, as described in [I-D.fossati-seat-expat] and
+   [I-D.fossati-seat-early-attestation].  Because the nonce is unique to
+   each connection, the freshness of the Evidence and of the cnf claim
+   is established for that connection, and an EAT captured from this
+   connection cannot be replayed in a different connection.
+
+   In certificate enrollment, the freshness of the Evidence is
+   established by a Verifier-provided nonce carried within the Evidence,
+   as specified in [I-D.ietf-lamps-attestation-freshness].  Because the
+   nonce is unique to each enrollment request, the freshness of the
+   Evidence and of the cnf claim is established for that request, and an
+   EAT captured from a previous enrollment request cannot be replayed in
+   a different one.
+
+8.9.  Scope of Guarantees
 
    This mechanism provides cryptographic evidence that the entity
    participating in the surrounding protocol demonstrated control of the
@@ -885,6 +913,8 @@ Acknowledgments
    The authors thank Paul Wouters and Nathanael Ritz for the discussion
    and comments.
 
+References
+
 Normative References
 
    [I-D.fossati-seat-early-attestation]
@@ -892,9 +922,9 @@ Normative References
               T. Reddy.K, "Using Attestation in Transport Layer Security
               (TLS) and Datagram Transport Layer Security (DTLS)", Work
               in Progress, Internet-Draft, draft-fossati-seat-early-
-              attestation-05, 3 July 2026,
+              attestation-06, 5 August 2026,
               <https://datatracker.ietf.org/doc/html/draft-fossati-seat-
-              early-attestation-05>.
+              early-attestation-06>.
 
    [I-D.fossati-tls-exported-attestation]
               Fossati, T., Sardar, M. U., Reddy.K, T., Sheffer, Y.,
@@ -977,6 +1007,16 @@ Normative References
               Wallace, "The Entity Attestation Token (EAT)", RFC 9711,
               DOI 10.17487/RFC9711, April 2025,
               <https://www.rfc-editor.org/rfc/rfc9711>.
+
+Informative References
+
+   [I-D.fossati-seat-expat]
+              Sardar, M. U., Fossati, T., Reddy.K, T., Sheffer, Y.,
+              Tschofenig, H., and I. Mihalcea, "Remote Attestation with
+              Exported Authenticators", Work in Progress, Internet-
+              Draft, draft-fossati-seat-expat-03, 4 July 2026,
+              <https://datatracker.ietf.org/doc/html/draft-fossati-seat-
+              expat-03>.
 
 Authors' Addresses
 
