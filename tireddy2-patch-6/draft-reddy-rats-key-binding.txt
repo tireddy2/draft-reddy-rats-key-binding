@@ -114,7 +114,9 @@ Table of Contents
      8.9.  Scope of Guarantees
    9.  IANA Considerations
    Acknowledgments
-   Normative References
+   References
+     Normative References
+     Informative References
    Authors' Addresses
 
 1.  Introduction
@@ -911,6 +913,8 @@ Acknowledgments
    The authors thank Paul Wouters and Nathanael Ritz for the discussion
    and comments.
 
+References
+
 Normative References
 
    [I-D.fossati-seat-early-attestation]
@@ -921,14 +925,6 @@ Normative References
               attestation-06, 5 August 2026,
               <https://datatracker.ietf.org/doc/html/draft-fossati-seat-
               early-attestation-06>.
-
-   [I-D.fossati-seat-expat]
-              Sardar, M. U., Fossati, T., Reddy.K, T., Sheffer, Y.,
-              Tschofenig, H., and I. Mihalcea, "Remote Attestation with
-              Exported Authenticators", Work in Progress, Internet-
-              Draft, draft-fossati-seat-expat-03, 4 July 2026,
-              <https://datatracker.ietf.org/doc/html/draft-fossati-seat-
-              expat-03>.
 
    [I-D.fossati-tls-exported-attestation]
               Fossati, T., Sardar, M. U., Reddy.K, T., Sheffer, Y.,
@@ -1011,6 +1007,16 @@ Normative References
               Wallace, "The Entity Attestation Token (EAT)", RFC 9711,
               DOI 10.17487/RFC9711, April 2025,
               <https://www.rfc-editor.org/rfc/rfc9711>.
+
+Informative References
+
+   [I-D.fossati-seat-expat]
+              Sardar, M. U., Fossati, T., Reddy.K, T., Sheffer, Y.,
+              Tschofenig, H., and I. Mihalcea, "Remote Attestation with
+              Exported Authenticators", Work in Progress, Internet-
+              Draft, draft-fossati-seat-expat-03, 4 July 2026,
+              <https://datatracker.ietf.org/doc/html/draft-fossati-seat-
+              expat-03>.
 
 Authors' Addresses
 
