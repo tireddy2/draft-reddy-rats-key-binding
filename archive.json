@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-09T01:17:16.752535+00:00",
+  "timestamp": "2026-08-13T01:27:10.792927+00:00",
   "repo": "tireddy2/draft-reddy-rats-key-binding",
   "labels": [
     {
@@ -1097,26 +1097,94 @@
       "id": "PR_kwDORSN2L8775Hze",
       "title": "Added Freshness and Replay Protection",
       "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/18",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "tireddy2",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-08-07T06:02:25Z",
-      "updatedAt": "2026-08-07T06:02:25Z",
+      "updatedAt": "2026-08-12T16:02:55Z",
       "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
       "baseRefName": "main",
       "baseRefOid": "1035c73a9dd232982d26a5b8bb030cb76bbbc4a1",
       "headRepository": "tireddy2/draft-reddy-rats-key-binding",
       "headRefName": "tireddy2-patch-6",
-      "headRefOid": "7deb0ff20f22a733218a452b3f4c95de6fafb6a2",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "007a1577ad626881e91685e265a9b7d61207c47d",
+      "closedAt": "2026-08-12T16:02:55Z",
+      "mergedAt": "2026-08-12T16:02:55Z",
+      "mergedBy": "tireddy2",
+      "mergeCommit": {
+        "oid": "85921ff162c229c60e101b3b3cdf78bc5afd95a1"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDORSN2L88AAAABJOzUdg",
+          "commit": {
+            "abbreviatedOid": "7deb0ff"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "LGMT, thanks!\n\nThe only observation I have is that all the newly introduced references look informative rather than normative.",
+          "createdAt": "2026-08-12T08:24:19Z",
+          "updatedAt": "2026-08-12T08:24:19Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABJP7WrA",
+          "commit": {
+            "abbreviatedOid": "7deb0ff"
+          },
+          "author": "ionut-arm",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "LGTM, thank you!",
+          "createdAt": "2026-08-12T10:49:53Z",
+          "updatedAt": "2026-08-12T10:49:53Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABJSZsYg",
+          "commit": {
+            "abbreviatedOid": "7deb0ff"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-12T15:28:15Z",
+          "updatedAt": "2026-08-12T15:32:51Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "```suggestion\nIn certificate enrollment, the freshness of the Evidence is established by a Verifier-provided nonce carried within the Evidence, as specified in {{?I-D.ietf-lamps-attestation-freshness}}. Because the nonce is unique to each enrollment request, the freshness of the Evidence and of the `cnf` claim is established for that request, and an EAT captured from a previous enrollment request cannot be replayed in a different one.\n```",
+              "createdAt": "2026-08-12T15:28:15Z",
+              "updatedAt": "2026-08-12T15:32:51Z"
+            },
+            {
+              "originalPosition": 9,
+              "body": "```suggestion\nIn TLS certificate-based authentication, the `eat_nonce` claim is bound to the TLS connection, as described in {{?I-D.fossati-seat-expat}} and {{?I-D.fossati-seat-early-attestation}}. Because the nonce is unique to each connection, the freshness of the Evidence and of the `cnf` claim is established for that connection, and an EAT captured from this connection cannot be replayed in a different connection.\n```",
+              "createdAt": "2026-08-12T15:32:42Z",
+              "updatedAt": "2026-08-12T15:32:51Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABJSebIQ",
+          "commit": {
+            "abbreviatedOid": "007a157"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "\ud83d\udea2 it!",
+          "createdAt": "2026-08-12T15:35:34Z",
+          "updatedAt": "2026-08-12T15:35:34Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
