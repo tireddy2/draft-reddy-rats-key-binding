@@ -84,10 +84,11 @@ The subject public key is conveyed using the EAT `cnf` claim defined in {{!RFC87
 
 Remote attestation enables an entity to produce attestation evidence that a verifier can use to assess whether the entity's platform state satisfies a required policy. In certificate enrollment and authentication protocols (e.g., TLS), a common security policy requirement is that a private key used by an endpoint must be generated, stored, and protected within a trusted execution environment (TEE) or comparable hardware root of trust.
 
-In certificate enrollment workflows, a Certification Authority (CA) may require attestation evidence demonstrating that the private key corresponding to the public key in a certificate signing request (CSR) is protected by a hardware-backed environment. The LAMPS CSR Attestation specification {{!I-D.ietf-lamps-csr-attestation}} defines mechanisms for including attestation evidence alongside a CSR. In this model, the CA verifies the CSR signature using the public key contained in the request and independently verifies the attestation evidence according to the RATS architecture, using applicable endorsements and trust anchors.
+In certificate enrollment workflows, a Certification Authority (CA) may require attestation evidence demonstrating that the private key corresponding to the public key in a certificate signing request (CSR) is protected by a hardware-backed environment. The LAMPS CSR Attestation specification {{?I-D.ietf-lamps-csr-attestation}} defines mechanisms for including attestation evidence alongside a CSR. In this model, the CA verifies the CSR signature using the public key contained in the request and independently verifies the attestation evidence according to the RATS architecture, using applicable endorsements and trust anchors.
+
 However, attestation evidence does not inherently provide a cryptographic proof that the private key used to sign the CSR is the same key that is generated, stored, or protected within the attested environment. The CSR signature demonstrates possession of a private key, and the attestation demonstrates properties of a platform state, but there is no standardized mechanism that cryptographically binds these two validations together. An endpoint could present valid attestation evidence from a protected environment while submitting a certificate signing request (CSR) that is signed with a private key not generated or stored within that environment. In this case, the Certification Authority has no intrinsic cryptographic assurance that the private key corresponding to the CSR public key benefits from the protections described in the attestation evidence.
 
-A similar problem exists in TLS-based scenarios. The TLS Exported Attestation specification {{!I-D.fossati-seat-expat}} and the TLS Early Attestation specification {{!I-D.fossati-seat-early-attestation}} define mechanisms for conveying attestation evidence within a TLS connection. While the attestation evidence is bound to the TLS connection in these approaches, it does not intrinsically bind the attested environment to the private key corresponding to the end-entity certificate used for TLS authentication. An endpoint could therefore obtain valid attestation evidence from a protected environment while performing certificate-based TLS authentication using a private key that is not confined to that environment. For example, the TLS private key may reside outside the trusted execution environment and lack the protections claimed by the attestation evidence.
+A similar problem exists in TLS-based scenarios. The TLS Exported Attestation specification {{?I-D.fossati-seat-expat}} and the TLS Early Attestation specification {{?I-D.fossati-seat-early-attestation}} define mechanisms for conveying attestation evidence within a TLS connection. While the attestation evidence is bound to the TLS connection in these approaches, it does not intrinsically bind the attested environment to the private key corresponding to the end-entity certificate used for TLS authentication. An endpoint could therefore obtain valid attestation evidence from a protected environment while performing certificate-based TLS authentication using a private key that is not confined to that environment. For example, the TLS private key may reside outside the trusted execution environment and lack the protections claimed by the attestation evidence.
 
 This separation between validation of attestation evidence and validation of certificate private key creates a class of key substitution attacks. In such an attack:
 
@@ -103,13 +104,11 @@ A relying party will also require additional claims describing key protection pr
 Appendix A.1.4 of {{!RFC9711}} illustrates how a key and key store may be represented in evidence. However, the example uses private-use claim labels and does not define standardized key-protection claims. This specification uses the standardized `cnf` claim from {{!RFC8747}} and {{!RFC7800}} and defines a new claim for key-protection attributes and usage constraints, while relying on protocol-level proof of possession.
 
 
-The use of directly conveyed key protection properties in attestation evidence is consistent with {{!I-D.ietf-rats-pkix-key-attestation}}, which defines attributes describing protection properties of managed keys, such as extractable, never-extractable, sensitive, and local.
-
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
 
-The reader is assumed to be familiar with the vocabulary and concepts defined in the RATS Architecture ({{!RFC9334}}) such as Attester, Relying Party, Verifier.
+The reader is assumed to be familiar with the vocabulary and concepts defined in the RATS Architecture ({{?RFC9334}}) such as Attester, Relying Party, Verifier.
 
 The reader is assumed to be familiar with the common vocabulary and concepts defined in {{!RFC5280}} such as certificate, signature, attribute, verification and validation.
 
@@ -119,7 +118,7 @@ Attestation Key (AK): A cryptographic key, typically hardware-backed, used to si
 
 Attestation Evidence: Claims about a platform's state, signed by an Attestation Key, and conveyed in an Entity Attestation Token (EAT).
 
-Entity Attestation Token (EAT): A token format that conveys attestation claims, as defined in {{?RFC9711}}.
+Entity Attestation Token (EAT): A token format that conveys attestation claims, as defined in {{!RFC9711}}.
 
 Subject Key: An asymmetric key pair for which the protection of the private component within an attested execution environment is being asserted. The corresponding public component is conveyed in the EAT `cnf` claim and compared with the key used in a CSR or TLS end-entity certificate.
 
@@ -163,8 +162,8 @@ This document defines an EAT profile and a new EAT claim that establish a crypto
 
 The profile provides two properties:
 
-1. Proof of Possession : Demonstration that the entity presenting the attestation controls the private component of the Subject Key.
-2. Key-to-Platform Binding : Cryptographic association between the private component of the Subject Key and the attested platform state.
+1. Proof of Possession: Demonstration that the entity presenting the attestation controls the private component of the Subject Key.
+2. Key-to-Platform Binding: Cryptographic association between the private component of the Subject Key and the attested platform state.
 
 The mechanism combines:
 
@@ -220,7 +219,7 @@ The validity period of the key attestation evidence is determined by the lifetim
 ## Freshness Requirements
 
 The verifier MUST provide a nonce with sufficient entropy to prevent replay. The nonce is conveyed to the Attester by the Relying Party through the surrounding protocol.
-The nonce MUST be unpredictable and unique within the verifier's replay window. The verifier MUST validate that the nonce claim in the EAT matches the nonce it supplied. Failure to include verifier-provided freshness renders the mechanism vulnerable to replay of previously valid attestation evidence. Mechanisms for obtaining and conveying such nonces in certificate enrollment protocols are described in {{!I-D.ietf-lamps-attestation-freshness}}.
+The nonce MUST be unpredictable and unique within the verifier's replay window. The verifier MUST validate that the nonce claim in the EAT matches the nonce it supplied. Failure to include verifier-provided freshness renders the mechanism vulnerable to replay of previously valid attestation evidence. Mechanisms for obtaining and conveying such nonces in certificate enrollment protocols are described in {{?I-D.ietf-lamps-attestation-freshness}}.
 
 The verifier-provided nonce is the primary mechanism for ensuring freshness of the attestation evidence. The EAT time-based claims (`iat`, `nbf`, and `exp`) provide an additional validity window for the attestation evidence but do not replace the requirement for a verifier-provided nonce. Verifiers MUST validate both the nonce and the applicable time-based claims when evaluating this profile.
 
@@ -230,7 +229,7 @@ Upon receipt of attestation evidence for this profile, the Verifier MUST perform
 
 1. Validate the signature on the EAT using the applicable trust anchors for the Attestation Key. If this validation fails, the attestation evidence MUST be rejected.
 
-2. Validate the `key-attributes` claim. The `key-attributes` claim MUST be present and MUST contain at least one member. Trust in the `key-attributes` claim depends on successful appraisal of the attestation evidence for the target environment in which the Subject Key is generated and protected. Such appraisal includes evaluation of measurements in the attestation evidence against the applicable reference values as described in the RATS Architecture {{!RFC9334}} and EAT {{!RFC9711}}.
+2. Validate the `key-attributes` claim. The `key-attributes` claim MUST be present and MUST contain at least one member. Trust in the `key-attributes` claim depends on successful appraisal of the attestation evidence for the target environment in which the Subject Key is generated and protected. Such appraisal includes evaluation of measurements in the attestation evidence against the applicable reference values as described in the RATS Architecture {{?RFC9334}} and EAT {{!RFC9711}}.
 
 3. Validate the EAT `eat_nonce` claim. The EAT `eat_nonce` claim MUST be present, MUST contain a single nonce value, and MUST match the verifier-supplied nonce.
 
@@ -263,7 +262,7 @@ Upon receipt of a CAB for this profile, the Verifier MUST perform the following 
 
 2. Validate the EAT `eat_nonce` claim in the PAT. The `eat_nonce` claim MUST be present, MUST contain a single nonce value, and MUST match the verifier-supplied nonce.
 
-3. Validate the `key-attributes` claim in the PAT. The `key-attributes` claim MUST be present and MUST contain at least one member. Trust in the `key-attributes` claim depends on successful appraisal of the PAT against applicable reference values as described in {{!RFC9334}}.
+3. Validate the `key-attributes` claim in the PAT. The `key-attributes` claim MUST be present and MUST contain at least one member. Trust in the `key-attributes` claim depends on successful appraisal of the PAT against applicable reference values as described in {{?RFC9334}}.
 
 4. Extract the KAK public key from the `cnf` claim in the PAT.
 
@@ -312,7 +311,7 @@ For example:
 
 * For RSA keys: The modulus (n) and public exponent (e) MUST match.
 * For elliptic curve keys: The curve identifier and public key coordinates (e.g., x and y values) MUST match. If an implementation supports point compression, keys MUST be decompressed to a common format before the comparison is performed.
-* For ML-DSA, SLH-DSA, and FN-DSA keys: The comparison MUST be performed over the raw public key byte string defined by the relevant algorithm specification (e.g., FIPS-204 for ML-DSA). In `cnf`, the Verifier MUST extract the raw public key bytes from the `pub` parameter of that structure. In an X.509 certificate {{!RFC5280}}, the public key is carried in the SubjectPublicKeyInfo structure. The Verifier MUST extract the contents of the `subjectPublicKey` BIT STRING and obtain the contained public key byte string. The raw public key byte string extracted from `cnf` and the byte string extracted from the certificate MUST match exactly.
+* For ML-DSA, SLH-DSA, and FN-DSA keys: The comparison MUST be performed over the raw public key byte string defined by the relevant algorithm specification (e.g., FIPS-204 for ML-DSA). In the `cnf` claim, such a key is carried as a COSE_Key or JWK; the Verifier MUST extract the raw public key byte string from the `pub` key parameter of that structure. In an X.509 certificate {{!RFC5280}}, the public key is carried in the SubjectPublicKeyInfo structure. The Verifier MUST extract the contents of the `subjectPublicKey` BIT STRING and obtain the contained public key byte string. The raw public key byte string extracted from `cnf` and the byte string extracted from the certificate MUST match exactly.
 * For other key types: The public key parameters defined by the relevant cryptographic specification MUST match exactly. Comparison based solely on serialized encodings (e.g., raw CBOR, JSON, or DER byte sequences) is NOT RECOMMENDED, as differences in encoding rules may cause equivalent keys to appear unequal.
 
 If the comparison fails, the key-to-platform binding is not established.
@@ -367,13 +366,13 @@ The AK signature over the EAT provides evidence about the Subject Key and its as
 
 By requiring both checks, the profile prevents reliance solely on self-reported claims about the presence of the Subject Key in the attested environment.
 
-## Binding of Key Protection Claims to the Attested Environment 
+## Binding of Key Protection Claims to the Attested Environment
 
-The `key-attributes` claim conveys protection properties of the Subject Key, such as non-exportability and hardware-level protection. For these claims to be trustworthy, they must be asserted by the attested environment that generated and holds the Subject Key, as it is the only entity with direct knowledge of and authority over the key protection properties. These attributes are therefore only as trustworthy as that environment itself, as established by appraisal against applicable reference values and endorsements and by the trust anchor for the Attestation Key ({{!RFC9334}}).
+The `key-attributes` claim conveys protection properties of the Subject Key, such as non-exportability and hardware-level protection. For these claims to be trustworthy, they must be asserted by the attested environment that generated and holds the Subject Key, as it is the only entity with direct knowledge of and authority over the key protection properties. These attributes are therefore only as trustworthy as that environment itself, as established by appraisal against applicable reference values and endorsements and by the trust anchor for the Attestation Key ({{?RFC9334}}).
 
 An alternative construction sometimes used in attestation protocols is to build an unsigned claims set (UCCS) containing the Subject Public Key and associated attributes, hash it, and supply the hash as a challenge to an existing attestation interface. In such constructions, the attestation evidence provides an indirect cryptographic binding between the claims set and the attested environment. However, a TEE-bound process acting as a proxy could forward a fabricated UCCS on behalf of an untrusted caller, causing the attested environment to sign claims it did not generate and cannot verify.
 
-This profile instead requires the Attestation Key (AK) to directly sign the EAT Claims Set containing the `key-attributes` claim and the Subject Public Key in `cnf`. This ensures that key protection attributes are conveyed as claims directly attested by the Attestor, eliminating the risk of fabricated claims being indirectly bound to attestation evidence.
+This profile instead requires the Attestation Key (AK) to directly sign the EAT Claims Set containing the `key-attributes` claim and the Subject Public Key in `cnf`. This ensures that key protection attributes are conveyed as claims directly attested by the Attester, eliminating the risk of fabricated claims being indirectly bound to attestation evidence.
 
 ## Key Protection Properties
 
@@ -400,7 +399,7 @@ Because protocol-level proof of possession is validated together with the EAT si
 
 If any of these validations fail, the binding is not established.
 
-## Key Re-hosting After Compromise 
+## Key Re-hosting After Compromise
 
 The illustration above concerns a Subject Key that does not match the attested `cnf`, and is detected by the `cnf` comparison. A related case concerns a Subject Key that genuinely was generated within an attested environment and is later compromised.
 
@@ -421,9 +420,9 @@ In deployments using a separate Verifier, the Relying Party MUST require the Ver
 The `eat_nonce` claim establishes the freshness of the Evidence, allowing the Verifier to determine that the AK-signed EAT is generated for the TLS connection or certificate enrollment request currently being evaluated.
 Because the Subject Public Key is carried in the `cnf` claim of the same EAT, the claim that this specific Subject Key is protected within the attested environment is likewise fresh.
 
-In TLS certificate-based authentication, the `eat_nonce` claim is bound to the TLS connection, as described in {{!I-D.fossati-seat-expat}} and {{!I-D.fossati-seat-early-attestation}}. Because the nonce is unique to each connection, the freshness of the Evidence and of the `cnf` claim is established for that connection, and an EAT captured from this connection cannot be replayed in a different connection.
+In TLS certificate-based authentication, the `eat_nonce` claim is bound to the TLS connection, as described in {{?I-D.fossati-seat-expat}} and {{?I-D.fossati-seat-early-attestation}}. Because the nonce is unique to each connection, the freshness of the Evidence and of the `cnf` claim is established for that connection, and an EAT captured from this connection cannot be replayed in a different connection.
 
-In certificate enrollment, the freshness of the Evidence is established by a Verifier-provided nonce carried within the Evidence, as specified in {{!I-D.ietf-lamps-attestation-freshness}}. Because the nonce is unique to each enrollment request, the freshness of the Evidence and of the `cnf` claim is established for that request, and an EAT captured from a previous enrollment request cannot be replayed in a different one.
+In certificate enrollment, the freshness of the Evidence is established by a Verifier-provided nonce carried within the Evidence, as specified in {{?I-D.ietf-lamps-attestation-freshness}}. Because the nonce is unique to each enrollment request, the freshness of the Evidence and of the `cnf` claim is established for that request, and an EAT captured from a previous enrollment request cannot be replayed in a different one.
 
 ## Scope of Guarantees
 
