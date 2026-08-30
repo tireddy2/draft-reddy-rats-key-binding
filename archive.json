@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-13T01:27:10.792927+00:00",
+  "timestamp": "2026-08-30T03:13:39.659856+00:00",
   "repo": "tireddy2/draft-reddy-rats-key-binding",
   "labels": [
     {
@@ -1183,6 +1183,59 @@
           "createdAt": "2026-08-12T15:35:34Z",
           "updatedAt": "2026-08-12T15:35:34Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "id": "PR_kwDORSN2L88AAAABBOBgPQ",
+      "title": "Address key exfiltration attack",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/19",
+      "state": "OPEN",
+      "author": "tireddy2",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-08-27T14:32:16Z",
+      "updatedAt": "2026-08-27T14:38:11Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "main",
+      "baseRefOid": "85921ff162c229c60e101b3b3cdf78bc5afd95a1",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "tireddy2-patch-7",
+      "headRefOid": "7eb72dd7f132a774b766473ccd504e93948c6fe1",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORSN2L88AAAABLIcYUQ",
+          "commit": {
+            "abbreviatedOid": "91e7e29"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-27T14:33:03Z",
+          "updatedAt": "2026-08-27T14:33:03Z",
+          "comments": [
+            {
+              "originalPosition": 25,
+              "body": "````suggestion\n## Key Re-hosting After Compromise\n````",
+              "createdAt": "2026-08-27T14:33:03Z",
+              "updatedAt": "2026-08-27T14:33:03Z"
+            },
+            {
+              "originalPosition": 14,
+              "body": "````suggestion\n## Binding of Key Protection Claims to the Attested Environment\n````",
+              "createdAt": "2026-08-27T14:33:03Z",
+              "updatedAt": "2026-08-27T14:33:03Z"
+            }
+          ]
         }
       ]
     }
