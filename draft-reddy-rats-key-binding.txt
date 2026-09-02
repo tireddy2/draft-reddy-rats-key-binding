@@ -5,14 +5,14 @@
 Remote ATtestation ProcedureS                                   T. Reddy
 Internet-Draft                                                     Nokia
 Intended status: Standards Track                           H. Tschofenig
-Expires: 5 March 2027                                           UniBw M.
+Expires: 6 March 2027                                           UniBw M.
                                                               T. Fossati
                                                                   Linaro
                                                              I. Mihalcea
                                                              Arm Limited
                                                              H. Birkholz
                                                           Fraunhofer SIT
-                                                        1 September 2026
+                                                        2 September 2026
 
 
           Key Attestation for Entity Attestation Tokens (EAT)
@@ -66,7 +66,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 March 2027.
+   This Internet-Draft will expire on 6 March 2027.
 
 Copyright Notice
 
@@ -579,21 +579,24 @@ Table of Contents
 
    The claim is defined using CDDL as follows:
 
-   key-attributes = {
-   ; Optional key protection attributes
-   ? extractable: bool,
-   ? never-extractable: bool,
-   ? sensitive: bool,
-   ? local: bool,
+   key-attributes = non-empty<{
+     ; Optional key protection attributes
+     ? extractable: bool,
+     ? never-extractable: bool,
+     ? sensitive: bool,
+     ? local: bool,
 
-   ; Optional cryptographic usage constraints
-   ? purpose: [* oid]
-
-   }
+     ; Optional cryptographic usage constraints
+     ? purpose: [* oid]
+   }>
 
    oid = tstr  ; dotted-decimal OID string
 
+   non-empty<M> = (M) .and ({ + any => any })
+
    The key-attributes claim MUST contain at least one member.
+
+   Section 7.4 describes the semantics of the key-attributes members.
 
 7.2.  Subject Key in cnf
 
