@@ -283,23 +283,25 @@ This document defines a new EAT claim named `key-attributes` that conveys key pr
 The claim is defined using CDDL as follows:
 
 ~~~
-key-attributes = {
-; Optional key protection attributes
-? extractable: bool,
-? never-extractable: bool,
-? sensitive: bool,
-? local: bool,
+key-attributes = non-empty<{
+  ; Optional key protection attributes
+  ? extractable: bool,
+  ? never-extractable: bool,
+  ? sensitive: bool,
+  ? local: bool,
 
-; Optional cryptographic usage constraints
-? purpose: [* oid]
-
-}
+  ; Optional cryptographic usage constraints
+  ? purpose: [* oid]
+}>
 
 oid = tstr  ; dotted-decimal OID string
 
+non-empty<M> = (M) .and ({ + any => any })
 ~~~
 
 The `key-attributes` claim MUST contain at least one member.
+
+{{key-protection-attributes}} describes the semantics of the `key-attributes` members.
 
 ## Subject Key in cnf
 
@@ -320,7 +322,7 @@ If the comparison fails, the key-to-platform binding is not established.
 
 This profile relies on protocol-level proof of possession for the Subject Key. This document does not define a new in-token PoP container or signature format.
 
-## Key Protection Attributes
+## Key Protection Attributes {#key-protection-attributes}
 
 The `key-attributes` claim includes attributes describing key protection properties of the private component of the Subject Key.
 
