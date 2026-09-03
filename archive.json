@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-30T03:13:39.659856+00:00",
+  "timestamp": "2026-09-03T02:39:07.750013+00:00",
   "repo": "tireddy2/draft-reddy-rats-key-binding",
   "labels": [
     {
@@ -1191,24 +1191,26 @@
       "id": "PR_kwDORSN2L88AAAABBOBgPQ",
       "title": "Address key exfiltration attack",
       "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/19",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "tireddy2",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-08-27T14:32:16Z",
-      "updatedAt": "2026-08-27T14:38:11Z",
+      "updatedAt": "2026-09-01T11:14:45Z",
       "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
       "baseRefName": "main",
       "baseRefOid": "85921ff162c229c60e101b3b3cdf78bc5afd95a1",
       "headRepository": "tireddy2/draft-reddy-rats-key-binding",
       "headRefName": "tireddy2-patch-7",
       "headRefOid": "7eb72dd7f132a774b766473ccd504e93948c6fe1",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-09-01T11:14:45Z",
+      "mergedAt": "2026-09-01T11:14:45Z",
+      "mergedBy": "tireddy2",
+      "mergeCommit": {
+        "oid": "190d0adc94d8c872a48f0786ff9af1302575f2bd"
+      },
       "comments": [],
       "reviews": [
         {
@@ -1236,6 +1238,61 @@
               "updatedAt": "2026-08-27T14:33:03Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDORSN2L88AAAABLpmW0w",
+          "commit": {
+            "abbreviatedOid": "7eb72dd"
+          },
+          "author": "thomas-fossati",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "LvGTM, thanks!",
+          "createdAt": "2026-09-01T10:14:58Z",
+          "updatedAt": "2026-09-01T10:14:58Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "id": "PR_kwDORSN2L88AAAABBu3GCg",
+      "title": "CDDL clean up",
+      "url": "https://github.com/tireddy2/draft-reddy-rats-key-binding/pull/20",
+      "state": "MERGED",
+      "author": "thomas-fossati",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-09-01T10:35:45Z",
+      "updatedAt": "2026-09-02T07:57:57Z",
+      "baseRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "baseRefName": "main",
+      "baseRefOid": "85921ff162c229c60e101b3b3cdf78bc5afd95a1",
+      "headRepository": "tireddy2/draft-reddy-rats-key-binding",
+      "headRefName": "cddl",
+      "headRefOid": "e6fb4c54e27759b25c9d0447d9fb0b739f762e15",
+      "closedAt": "2026-09-02T07:57:57Z",
+      "mergedAt": "2026-09-02T07:57:57Z",
+      "mergedBy": "tireddy2",
+      "mergeCommit": {
+        "oid": "72fac616cac1678c5b62779ad3e1145c4935be9d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORSN2L88AAAABLqKr5w",
+          "commit": {
+            "abbreviatedOid": "e6fb4c5"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-01T11:24:01Z",
+          "updatedAt": "2026-09-01T11:24:01Z",
+          "comments": []
         }
       ]
     }
